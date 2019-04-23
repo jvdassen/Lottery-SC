@@ -1,15 +1,15 @@
 pragma solidity ^0.5.7;
 
 contract Lottery {
-    Configuration lotteryState;
+    State lotteryState;
     uint numberOfTickets = 0;
     uint totalPriceMoney = 0;
     mapping (uint => Ticket[]) tickets;
     uint64[] ticketNumbers;
     address[] winners;
-    uint256 numberOfWinners;
+    uint256 numberOfWinners = 0;
     
-    struct Configuration {
+    struct State {
         bool open;
         uint8 round;
         uint64 maxNumber;
@@ -19,6 +19,14 @@ contract Lottery {
     struct Ticket {
         uint64 number;
         address sender;
+    }
+    
+    constructor (uint maxNum, uint price) {
+        lotteryState = State(true, 0, maxNum, price);
+    }
+    
+    function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() {
+        tickets[numberOfTickets++].push(Ticket(numberForTicket, msg.address));
     }
     
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
@@ -43,22 +51,23 @@ contract Lottery {
         numberOfWinners = winners.length;
     }
     
-    function buyTicket () public {
-        if(lotteryState.open) {
-            
-        }
-    }
-    
-    function payOut () private {
-        if(!lotteryState.open) {
-            uint pricePerWinner = totalPriceMoney / numberOfWinners;
-            for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
-                // create transaction and send the price to each winner
+    function payOut () private lotteryIsClosed() {
+            if(numberOfWinners == 0) {
+                //no one claimed the price money -> reset ticket purchases but keep payOut
+                resetTicketPurchases();
+                
+            } else {
+                // one or more persons claimed the price -> pay them and reset the lottery
+                uint pricePerWinner = totalPriceMoney / numberOfWinners;
+                for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
+                    // create transaction and send the price to each winner
+                }
+                resetLotteryCompletely
             }
-        }
+        
     }
     
-    function resetLotteryCompletely () private {
+    function resetLotteryCompletely () private lotteryIsClosed() {
         resetTicketPurchases();
         resetLotteryState();
     }
@@ -71,6 +80,12 @@ contract Lottery {
         
     }
     
+    function closeLotteryAtSomePointInTime () private {
+        // do this e.g. after N blocks
+        lotteryState.open = false;
+        payOut();
+    }
+    
     function resetTicketPurchases () private {
             //Configuration lotteryState;
             numberOfTickets = 0;
@@ -79,4 +94,30 @@ contract Lottery {
             delete winners;
             numberOfWinners = 0;
     }
+    
+    modifier costs(uint _amount) {
+        require(
+            msg.value >= _amount,
+            "Not enough Ether provided."
+        );
+        _;
+        if (msg.value > _amount)
+            msg.sender.transfer(msg.value - _amount);
+    }
+    
+    modifier lotteryIsOpen () {
+        require(
+            lotteryState.open,
+            "Lottery cant accept ticket purchases at this stage"
+        );
+        _;
+    }
+    modifier lotteryIsClosed () {
+        require(
+            !lotteryState.open,
+            "Lottery is still open"
+        );
+        _;
+    }
 }
+
