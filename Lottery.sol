@@ -23,6 +23,7 @@ contract Lottery {
     
     constructor (uint maxNum, uint price) {
         lotteryState = State(true, 0, maxNum, price);
+	closeLotteryAtSomePointInTime();
     }
     
     function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() {
