@@ -28,6 +28,8 @@ contract Lottery {
     
     function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() {
         tickets[numberOfTickets++].push(Ticket(numberForTicket, msg.address));
+	totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
+	ticketNumbers.push(numberForTicket);
     }
     
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
