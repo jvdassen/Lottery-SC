@@ -1,9 +1,9 @@
-pragma solidity ^0.5.7;
+pragma solidity ^0.5.0;
 
 contract Lottery {
     State lotteryState;
-    uint numberOfTickets = 0;
-    uint totalPriceMoney = 0;
+    uint64 numberOfTickets = 0;
+    uint256 totalPriceMoney = 0;
     mapping (uint => Ticket[]) tickets;
     uint64[] ticketNumbers;
     address[] winners;
@@ -13,7 +13,7 @@ contract Lottery {
         bool open;
         uint8 round;
         uint64 maxNumber;
-        uint64 ticketPrice;
+        uint256 ticketPrice;
     }
     
     struct Ticket {
@@ -21,15 +21,15 @@ contract Lottery {
         address sender;
     }
     
-    constructor (uint maxNum, uint price) {
+    constructor (uint64 maxNum, uint256 price) public {
         lotteryState = State(true, 0, maxNum, price);
-	closeLotteryAtSomePointInTime();
+		closeLotteryAtSomePointInTime();
     }
     
     function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() {
-        tickets[numberOfTickets++].push(Ticket(numberForTicket, msg.address));
-	totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
-	ticketNumbers.push(numberForTicket);
+        tickets[numberOfTickets++].push(Ticket(numberForTicket, msg.sender));
+		totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
+		ticketNumbers.push(numberForTicket);
     }
     
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
@@ -65,7 +65,7 @@ contract Lottery {
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
                 }
-                resetLotteryCompletely
+                resetLotteryCompletely();
             }
         
     }
