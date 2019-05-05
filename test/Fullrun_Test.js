@@ -6,7 +6,8 @@ let catchRevert = require("./Exceptions.js").catchRevert;
 contract("Full Run Test", async function(accounts) {
 	
 	var protocol;
-    var oracle;
+	var oracle;
+	var campaign;
 	
     var Player1 = accounts[0];
 	var Player2 = accounts[1];
@@ -14,7 +15,17 @@ contract("Full Run Test", async function(accounts) {
 	it("Oracle", async function() {
         return await Oracle.deployed().then(async function(instance) {          
 			
-			var commit = instance.CommitHash(function(error, response) {
+			var campagin = instance.LogCampaignAdded(function(error, response) {
+				if (!error) {
+					console.log(response);
+					campaign = response.args.campaignID
+					//Address = response.args.addr;
+				}else{
+					console.log(error);
+				}
+			});
+
+			var commit = instance.LogCommit(function(error, response) {
 				if (!error) {
 					console.log(response);
 					//Address = response.args.addr;
@@ -23,7 +34,7 @@ contract("Full Run Test", async function(accounts) {
 				}
 			});
 			
-			var reveal = instance.RevealHash(function(error, response) {
+			var reveal = instance.LogReveal(function(error, response) {
 				if (!error) {
 					console.log(response);
 					//Address = response.args.addr;
@@ -32,7 +43,11 @@ contract("Full Run Test", async function(accounts) {
 				}
 			});
 			
-			await instance.commit("0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d");		
+			await instance.startNewCampaign();
+			
+			await instance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6");	
+
+			await instance.reveal(campaign,"1");	
 
 		});
     });
