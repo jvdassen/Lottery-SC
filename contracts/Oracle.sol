@@ -134,9 +134,7 @@ contract Oracle {
 
     function returnFunds(Campaign storage c) internal {
         for(uint i = 0; i < c.addressesOfParticipants.length; i++) {
-            if(c.participants[c.addressesOfParticipants[i]].revealed == true){
-                 c.addressesOfParticipants[i].transfer(c.deposit/c.revealsNum);
-            }
+            c.addressesOfParticipants[i].transfer(c.deposit/c.commitNum);
         }
     }
 }
