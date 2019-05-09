@@ -1,5 +1,6 @@
 
 var Oracle = artifacts.require("./Oracle.sol");
+var Oracle_Simple = artifacts.require("./Oracle_Simple.sol");
 var Lottery = artifacts.require("./Lottery.sol");
 let catchRevert = require("./Exceptions.js").catchRevert;
 
@@ -101,32 +102,55 @@ contract("Full Run Test", async function(accounts) {
 			console.log("RANDOM NUMBER IS: "+random);
 		});
 		
-		it("LotteryWithoutRandom", async function() {
-			//var winningNumber = 5;
+/*		it("Oracle2", async function() {
+		
+			return await Oracle_Simple.deployed().then(async function(instance) {
+				orInstance = instance;
+				var rand;
+				await Oracle_Simple.deployed().then(async function(orInstance) {        
+					for(let i= 0; i<100; i++){
+						rand = await instance.getRandom(10);
+						console.log(rand.args);
+					}
+				})
+			})
+		});*/
+			
+
+		it("LotteryWithoutRandomWith2WinnersOutOfThreePlayers", async function() {
+			var winningNumber = 5;
+			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+			console.log(balancePlayer1before);
+			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+			var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+			var balancePlayer1after;
+			var balancePlayer2after;
+			var balancePlayer3after;
 			return await Lottery.deployed().then(async function(instance) {  
-			console.log("Player1:");      
-			console.log(await web3.eth.getBalance(Player1));
-			await instance.buyTicket(10, {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
-			console.log("Player1 after Ticket Buy:");      
-			console.log(await web3.eth.getBalance(Player1));
-			console.log("Player2:");      
-			console.log(await web3.eth.getBalance(Player2));
-			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('1.0', "ether")});
-			console.log("Player2 after Ticket Buy:");      
-			console.log(await web3.eth.getBalance(Player2));
-			console.log("Player3:");      
-			console.log(await web3.eth.getBalance(Player3));
-			await instance.buyTicket(5, {from: Player3,value: await web3.utils.toWei('1.0', "ether")});
-			console.log("Player3 after Ticket Buy:");      
-			console.log(await web3.eth.getBalance(Player3));
-			await instance.closeLotteryAtSomePointInTime(5);	
-			console.log("Player1 after lottery:");      
-			console.log(await web3.eth.getBalance(Player1));
-			console.log("Player2 after lottery:");      
-			console.log(await web3.eth.getBalance(Player2));
-			console.log("Player3 after lottery:");      
-			console.log(await web3.eth.getBalance(Player3));
-  
+
+		
+			await instance.buyTicket(10, {from: Player1,value: await web3.utils.toWei('2.0', "ether")});
+			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 2);
+			balancePlayer1before = balancePlayer1after;
+			
+			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
+			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+			assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 2);
+			balancePlayer2before = balancePlayer2after;
+			
+			await instance.buyTicket(5, {from: Player3,value: await web3.utils.toWei('2.0', "ether")});
+			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
+			balancePlayer3before = balancePlayer3after;
+			
+			await instance.closeLotteryAtSomePointInTime(winningNumber);	
+			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before));
+			assert.equal(Math.round(balancePlayer2after), Math.round(balancePlayer2before) + 3);
+			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) + 3);
 
 			});
 		});	
