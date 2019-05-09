@@ -4,7 +4,7 @@ contract Lottery {
     State lotteryState;
     uint64 numberOfTickets = 0;
     uint256 totalPriceMoney = 0;
-    mapping (uint => Ticket[]) tickets;
+    mapping (uint => Ticket) tickets;
     uint64[] ticketNumbers;
     address[] winners;
     uint256 numberOfWinners = 0;
@@ -23,11 +23,11 @@ contract Lottery {
     
     constructor (uint64 maxNum, uint256 price) public {
         lotteryState = State(true, 0, maxNum, price);
-		closeLotteryAtSomePointInTime();
+		//closeLotteryAtSomePointInTime();
     }
     
-    function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() {
-        tickets[numberOfTickets++].push(Ticket(numberForTicket, msg.sender));
+    function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() numberIsAllowed(numberForTicket){
+        tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
 		totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
 		ticketNumbers.push(numberForTicket);
     }
@@ -44,11 +44,9 @@ contract Lottery {
     }
     
     function computeWinners (uint64 lotteryResult) private {
-        for(uint64 memberIndex = 0; memberIndex < numberOfTickets; memberIndex++) {
-            for (uint64 ticketIndex = 0; ticketIndex < tickets[numberOfTickets].length; ticketIndex++) {
-                if(tickets[memberIndex][ticketIndex].number == lotteryResult) {
-                    winners.push(tickets[memberIndex][ticketIndex].sender);
-                }   
+        for (uint64 ticketIndex = 0; ticketIndex < numberOfTickets; ticketIndex++) {
+            if(tickets[ticketIndex].number == lotteryResult) {
+                winners.push(tickets[ticketIndex].sender);
             }
         }
         numberOfWinners = winners.length;
@@ -84,8 +82,10 @@ contract Lottery {
     }
     
     function closeLotteryAtSomePointInTime () private {
-        // do this e.g. after N blocks
+        // TODO do this e.g. after N blocks
         lotteryState.open = false;
+	// TODO: input variable should be random computed with the oracle of compute winners
+	    computeWinners(5);
         payOut();
     }
     
@@ -119,6 +119,14 @@ contract Lottery {
         require(
             !lotteryState.open,
             "Lottery is still open"
+        );
+        _;
+    }
+
+    modifier numberIsAllowed (uint64 numberForTicket) {
+        require(
+            numberForTicket>=0 && numberForTicket<=lotteryState.maxNumber,
+            "Lottery cant accept such a number, it is out of range"
         );
         _;
     }
