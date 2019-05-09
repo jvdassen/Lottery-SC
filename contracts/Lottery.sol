@@ -6,7 +6,7 @@ contract Lottery {
     uint256 totalPriceMoney = 0;
     mapping (uint => Ticket) tickets;
     uint64[] ticketNumbers;
-    address[] winners;
+    address payable[] winners;
     uint256 numberOfWinners = 0;
     
     struct State {
@@ -15,10 +15,10 @@ contract Lottery {
         uint64 maxNumber;
         uint256 ticketPrice;
     }
-    
+     
     struct Ticket {
         uint64 number;
-        address sender;
+        address payable sender;
     }
     
     constructor (uint64 maxNum, uint256 price) public {
@@ -26,7 +26,12 @@ contract Lottery {
 		//closeLotteryAtSomePointInTime();
     }
     
-    function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() numberIsAllowed(numberForTicket){
+    //function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() numberIsAllowed(numberForTicket){
+    function buyTicket (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
+        require(
+            msg.value >= lotteryState.ticketPrice,
+            "Not enough Ether provided."
+        );
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
 		totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
 		ticketNumbers.push(numberForTicket);
@@ -62,10 +67,11 @@ contract Lottery {
                 uint pricePerWinner = totalPriceMoney / numberOfWinners;
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
+                    winners[winnerIndex].transfer(pricePerWinner);
                 }
                 resetLotteryCompletely();
             }
-        
+            lotteryState.open = true;
     }
     
     function resetLotteryCompletely () private lotteryIsClosed() {
@@ -74,18 +80,18 @@ contract Lottery {
     }
     
     function resetLotteryState () private {
-        
+
     }
     
     function queryLotteryNumberFromOracle () private {
         
     }
     
-    function closeLotteryAtSomePointInTime () private {
+    function closeLotteryAtSomePointInTime (uint64 winningNumber) public {
         // TODO do this e.g. after N blocks
         lotteryState.open = false;
 	// TODO: input variable should be random computed with the oracle of compute winners
-	    computeWinners(5);
+	    computeWinners(winningNumber);
         payOut();
     }
     
@@ -104,8 +110,8 @@ contract Lottery {
             "Not enough Ether provided."
         );
         _;
-        if (msg.value > _amount)
-            msg.sender.transfer(msg.value - _amount);
+        /*if (msg.value > _amount)
+            msg.sender.transfer(msg.value - _amount);*/
     }
     
     modifier lotteryIsOpen () {

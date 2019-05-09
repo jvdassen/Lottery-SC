@@ -1,6 +1,6 @@
 
 var Oracle = artifacts.require("./Oracle.sol");
-//var Lottery = artifacts.require("./Lottery.sol");
+var Lottery = artifacts.require("./Lottery.sol");
 let catchRevert = require("./Exceptions.js").catchRevert;
 
 contract("Full Run Test", async function(accounts) {
@@ -8,8 +8,10 @@ contract("Full Run Test", async function(accounts) {
 	var campaign;
 	var random;
 
-    var Player1 = accounts[0];
+  var Player1 = accounts[0];
 	var Player2 = accounts[1];
+	var Player3 = accounts[2];
+	var Player4 = accounts[3];
 	
 	it("Oracle", async function() {
         return await Oracle.deployed().then(async function(instance) {          
@@ -51,7 +53,7 @@ contract("Full Run Test", async function(accounts) {
 				}
 			});
 			
-			await instance.startNewCampaign(3,3, await web3.utils.toWei('1.0', "ether"),100);
+			await instance.startNewCampaign(1,3,3, await web3.utils.toWei('1.0', "ether"),100);
 			
 			await instance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
 			
@@ -68,7 +70,37 @@ contract("Full Run Test", async function(accounts) {
 			console.log("RANDOM NUMBER IS: "+random);
 
 		});
-    });
+		});
+		
+		it("LotteryWithoutRandom", async function() {
+			//var winningNumber = 5;
+			return await Lottery.deployed().then(async function(instance) {  
+			console.log("Player1:");      
+			console.log(await web3.eth.getBalance(Player1));
+			await instance.buyTicket(10, {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
+			console.log("Player1 after Ticket Buy:");      
+			console.log(await web3.eth.getBalance(Player1));
+			console.log("Player2:");      
+			console.log(await web3.eth.getBalance(Player2));
+			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('1.0', "ether")});
+			console.log("Player2 after Ticket Buy:");      
+			console.log(await web3.eth.getBalance(Player2));
+			console.log("Player3:");      
+			console.log(await web3.eth.getBalance(Player3));
+			await instance.buyTicket(5, {from: Player3,value: await web3.utils.toWei('1.0', "ether")});
+			console.log("Player3 after Ticket Buy:");      
+			console.log(await web3.eth.getBalance(Player3));
+			await instance.closeLotteryAtSomePointInTime(5);	
+			console.log("Player1 after lottery:");      
+			console.log(await web3.eth.getBalance(Player1));
+			console.log("Player2 after lottery:");      
+			console.log(await web3.eth.getBalance(Player2));
+			console.log("Player3 after lottery:");      
+			console.log(await web3.eth.getBalance(Player3));
+  
+
+			});
+		});
 	
     it("Instantiation", async function() {
         /*
