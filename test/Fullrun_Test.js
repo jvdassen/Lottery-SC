@@ -66,6 +66,7 @@ contract("Full Run Test", async function(accounts) {
 					await oracleInstance.commit(campaign,"0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('1.0', "ether")});			
 		
 					await oracleInstance.reveal(campaign,"1", {from: Player1});
+					
 					await oracleInstance.reveal(campaign,"dominik", {from: Player2});
 		
 					//wait one transaction so the reveal deadline is reached
