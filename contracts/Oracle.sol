@@ -42,18 +42,18 @@ contract Oracle {
 	}
 
 
-	function startNewCampaign(uint256 lotteryId, uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public{
+	function startNewCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public returns(uint256){
 
-		uint256 campaginId = lotteryId;
+		uint256 campaginId = campaigns.length++;
 		Campaign storage c = campaigns[campaginId];
-        c.id = campaginId;
         c.commitDeadline = block.number+commitDuration;
         c.revealDeadline = c.commitDeadline+revealDuration;
         c.minimumFunding = minimumFunding;
         c.modulo = modulo;
         c.owner = msg.sender;
-		
+		c.id = campaginId;
 		emit LogCampaignAdded(campaginId);
+        return campaginId;
     }
 
 	event LogCommit(uint256 indexed CampaignId, address indexed from, bytes32 commitment);

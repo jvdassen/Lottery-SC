@@ -1,73 +1,86 @@
 
 var Oracle = artifacts.require("./Oracle.sol");
-//var Lottery = artifacts.require("./Lottery.sol");
+var Lottery = artifacts.require("./Lottery.sol");
 let catchRevert = require("./Exceptions.js").catchRevert;
 
 contract("Full Run Test", async function(accounts) {
 	
 	var campaign;
-	var random;
+	var rand;
+	var oracleInstance;
+	var lotteryInstance;
 
-    var Player1 = accounts[0];
+  var Player1 = accounts[0];
 	var Player2 = accounts[1];
 	
 	it("Oracle", async function() {
-        return await Oracle.deployed().then(async function(instance) {          
-			
-			var campagin = instance.LogCampaignAdded(function(error, response) {
-				if (!error) {
-					//console.log(response);
-					campaign = response.args.campaignID
-					//Address = response.args.addr;
-				}else{
-					console.log(error);
-				}
+		
+			return await Lottery.deployed().then(async function(instance) {
+				lotteryInstance = instance;
+				
+				await Oracle.deployed().then(async function(orInstance) {          
+				
+					oracleInstance = orInstance;
+		
+					var campagin = oracleInstance.LogCampaignAdded(function(error, response) {
+						if (!error) {
+							//console.log(response);
+							campaign = response.args.campaignID
+							//Address = response.args.addr;
+						}else{
+							console.log(error);
+						}
+					});
+		
+					var commit = oracleInstance.LogCommit(function(error, response) {
+						if (!error) {
+							//console.log(response);
+							//Address = response.args.addr;
+						}else{
+							console.log(error);
+						}
+					});
+					
+					var reveal = oracleInstance.LogReveal(function(error, response) {
+						if (!error) {
+							//console.log(response);
+							//Address = response.args.addr;
+						}else{
+							console.log(error);
+						}
+					});
+		
+					var random = oracleInstance.LogRandom(function(error, response) {
+						if (!error) {
+							//console.log(response);
+							rand = response.args.random;
+						}else{
+							console.log(error);
+						}
+					});
+					
+					await oracleInstance.startNewCampaign(3,3, await web3.utils.toWei('1.0', "ether"),100);
+					
+					await oracleInstance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
+					
+					await oracleInstance.commit(campaign,"0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('1.0', "ether")});			
+		
+					await oracleInstance.reveal(campaign,"1", {from: Player1});
+					await oracleInstance.reveal(campaign,"dominik", {from: Player2});
+		
+					//wait one transaction so the reveal deadline is reached
+					await web3.eth.sendTransaction({ from: Player2, to: Player1, value:await web3.utils.toWei('1.0', "ether") });
+		
+					await oracleInstance.getRandom(campaign);
+		
+					console.log("RANDOM NUMBER IS: "+rand);
+		
+				});
+
+				await oracleInstance.getRandom(campaign)
+				console.log("RANDOM NUMBER IS: "+rand);
 			});
-
-			var commit = instance.LogCommit(function(error, response) {
-				if (!error) {
-					//console.log(response);
-					//Address = response.args.addr;
-				}else{
-					console.log(error);
-				}
-			});
 			
-			var reveal = instance.LogReveal(function(error, response) {
-				if (!error) {
-					//console.log(response);
-					//Address = response.args.addr;
-				}else{
-					console.log(error);
-				}
-			});
-
-			var random = instance.LogRandom(function(error, response) {
-				if (!error) {
-					//console.log(response);
-					random = response.args.random;
-				}else{
-					console.log(error);
-				}
-			});
-			
-			await instance.startNewCampaign(3,3, await web3.utils.toWei('1.0', "ether"),100);
-			
-			await instance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
-			
-			await instance.commit(campaign,"0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('1.0', "ether")});			
-
-			await instance.reveal(campaign,"1", {from: Player1});
-			await instance.reveal(campaign,"dominik", {from: Player2});
-
-			//wait one transaction so the reveal deadline is reached
-			await web3.eth.sendTransaction({ from: Player2, to: Player1, value:await web3.utils.toWei('1.0', "ether") });
-
-			await instance.getRandom(campaign);
-
-			console.log("RANDOM NUMBER IS: "+random);
-
-		});
     });
 	
     it("Instantiation", async function() {
