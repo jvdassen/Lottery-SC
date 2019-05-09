@@ -42,16 +42,17 @@ contract Oracle {
 	}
 
 
-	function startNewCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public{
+	function startNewCampaign(uint256 lotteryId, uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public{
 
-		uint256 campaginId = campaigns.length++;
+		uint256 campaginId = lotteryId;
 		Campaign storage c = campaigns[campaginId];
+        c.id = campaginId;
         c.commitDeadline = block.number+commitDuration;
         c.revealDeadline = c.commitDeadline+revealDuration;
         c.minimumFunding = minimumFunding;
         c.modulo = modulo;
         c.owner = msg.sender;
-		c.id = campaginId;
+		
 		emit LogCampaignAdded(campaginId);
     }
 
@@ -83,7 +84,8 @@ contract Oracle {
     function reveal(uint256 campaignId, string calldata secret) external {
         Campaign storage c = campaigns[campaignId];
         Participant storage p = c.participants[msg.sender];
-        if (block.number >= c.revealDeadline) revert("Commitphase is already over");
+        if (block.number >= c.revealDeadline) revert("Revealphase is already over");
+        if (block.number < c.commitDeadline) revert("Commitphase not over yet");
         revealCampaign(campaignId, secret, c, p);
     }
 
@@ -134,7 +136,9 @@ contract Oracle {
 
     function returnFunds(Campaign storage c) internal {
         for(uint i = 0; i < c.addressesOfParticipants.length; i++) {
-            c.addressesOfParticipants[i].transfer(c.deposit/c.commitNum);
+            if(c.participants[c.addressesOfParticipants[i]].revealed == true){
+                c.addressesOfParticipants[i].transfer(c.deposit/c.revealsNum);
+            }
         }
     }
 }
