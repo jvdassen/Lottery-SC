@@ -69,6 +69,7 @@ contract Lottery {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
                 }
+                totalPriceMoney = 0;
                 resetLotteryCompletely();
             }
             lotteryState.open = true;
@@ -97,8 +98,11 @@ contract Lottery {
     
     function resetTicketPurchases () private {
             //Configuration lotteryState;
+            //delete tickets
+            for(uint64 i = 0; i < numberOfTickets; i++){
+                delete tickets[numberOfTickets];
+            }
             numberOfTickets = 0;
-            //delete tickets;
             delete ticketNumbers;
             delete winners;
             numberOfWinners = 0;
