@@ -16,7 +16,7 @@ contract("Lottery test", async function(accounts) {
 	var Player3 = accounts[2];
 	var Player4 = accounts[3];
 		it("LotteryWithoutRandomWith2WinnersOutOfThreePlayers", async function() {
-			var winningNumber = 5;
+			var winningNumber = 0;
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			//console.log(balancePlayer1before);
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -24,25 +24,35 @@ contract("Lottery test", async function(accounts) {
 			var balancePlayer1after;
 			var balancePlayer2after;
 			var balancePlayer3after;
+
+      var oracle = await Oracle_Simple.deployed();
+
 			return await Lottery.deployed().then(async function(instance) {  
 
+      var campagin = instance.LogNumber(function(error, response) {
+        if (!error) {
+//          console.log('Rand nr:', parseInt(response.args.winningNumber))
+        }else{
+          console.log(error);
+        }
+      });
 		
 			await instance.buyTicket(10, {from: Player1,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 2);
 			balancePlayer1before = balancePlayer1after;
 			
-			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(0, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 2);
 			balancePlayer2before = balancePlayer2after;
 			
-			await instance.buyTicket(5, {from: Player3,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(0, {from: Player3,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
 			balancePlayer3before = balancePlayer3after;
 			
-			await instance.closeLotteryAtSomePointInTime(winningNumber);	
+			await instance.closeLotteryAtSomePointInTime();	
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
@@ -78,7 +88,7 @@ contract("Lottery test", async function(accounts) {
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
 			balancePlayer3before = balancePlayer3after;
-			await instance.closeLotteryAtSomePointInTime(winningNumber);	
+			await instance.closeLotteryAtSomePointInTime();	
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
@@ -92,7 +102,7 @@ contract("Lottery test", async function(accounts) {
 			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 2);
 			balancePlayer1before = balancePlayer1after;
 			
-			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(0, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 2);
 			balancePlayer2before = balancePlayer2after;
@@ -102,7 +112,7 @@ contract("Lottery test", async function(accounts) {
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
 			balancePlayer3before = balancePlayer3after;
 			
-			await instance.closeLotteryAtSomePointInTime(winningNumber);	
+			await instance.closeLotteryAtSomePointInTime();	
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');

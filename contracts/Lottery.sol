@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+import {Oracle_Simple} from './Oracle_Simple.sol';
+
 contract Lottery {
     State lotteryState;
     uint64 numberOfTickets = 0;
@@ -8,6 +10,7 @@ contract Lottery {
     uint64[] ticketNumbers;
     address payable[] winners;
     uint256 numberOfWinners = 0;
+    Oracle_Simple oracle;
     
     struct State {
         bool open;
@@ -21,20 +24,21 @@ contract Lottery {
         address payable sender;
     }
     
-    constructor (uint64 maxNum, uint256 price) public {
+    constructor (uint64 maxNum, uint256 price, address oracleAddress) public {
         lotteryState = State(true, 0, maxNum, price);
-		//closeLotteryAtSomePointInTime();
+        oracle = Oracle_Simple(oracleAddress);
+        //closeLotteryAtSomePointInTime();
     }
     
-    //function buyTicket (uint64 numberForTicket) public payable costs(lotteryState.ticketPrice) lotteryIsOpen() numberIsAllowed(numberForTicket){
     function buyTicket (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
         require(
             msg.value >= lotteryState.ticketPrice,
             "Not enough Ether provided."
         );
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
-		totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
-		ticketNumbers.push(numberForTicket);
+        totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
+        ticketNumbers.push(numberForTicket);
+        //closeLotteryAtSomePointInTime();
     }
     
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
@@ -48,7 +52,7 @@ contract Lottery {
         return found;
     }
     
-    function computeWinners (uint64 lotteryResult) private {
+    function computeWinners (uint256 lotteryResult) private {
         for (uint64 ticketIndex = 0; ticketIndex < numberOfTickets; ticketIndex++) {
             if(tickets[ticketIndex].number == lotteryResult) {
                 winners.push(tickets[ticketIndex].sender);
@@ -69,11 +73,11 @@ contract Lottery {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
                 }
-                totalPriceMoney = 0;
-                resetLotteryCompletely();
-            }
+                totalPriceMoney = 0; resetLotteryCompletely(); }
             lotteryState.open = true;
     }
+
+  	event LogNumber(uint256 winningNumber);
     
     function resetLotteryCompletely () private lotteryIsClosed() {
         resetTicketPurchases();
@@ -88,12 +92,16 @@ contract Lottery {
         
     }
     
-    function closeLotteryAtSomePointInTime (uint64 winningNumber) public {
+    function closeLotteryAtSomePointInTime () public {
         // TODO do this e.g. after N blocks
         lotteryState.open = false;
-	// TODO: input variable should be random computed with the oracle of compute winners
-	    computeWinners(winningNumber);
-        payOut();
+        // TODO: input variable should be random computed with the oracle of compute winners
+        if(true) {
+          uint256 winningNumber = oracle.getRandom(1);
+          emit LogNumber(winningNumber);
+          computeWinners(winningNumber);
+          payOut();
+        }
     }
     
     function resetTicketPurchases () private {
