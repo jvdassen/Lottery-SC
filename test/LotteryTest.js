@@ -84,16 +84,16 @@ var Player1 = accounts[0];
 		
 
 			//first round without winner
-			await instance.buyTicket(10, {from: Player1,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(10, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player1,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 2);
 			balancePlayer1before = balancePlayer1after;
 			
-			await instance.buyTicket(3, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(3, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player2,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 2);
 			balancePlayer2before = balancePlayer2after;	
-			await instance.buyTicket(2, {from: Player3,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(2, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player3,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
 			balancePlayer3before = balancePlayer3after;
@@ -106,17 +106,17 @@ var Player1 = accounts[0];
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before));
 
 			// second round with one winner
-			await instance.buyTicket(1, {from: Player1,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(1, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player1,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 2);
 			balancePlayer1before = balancePlayer1after;
 			
-			await instance.buyTicket(5, {from: Player2,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(5, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player2,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 2);
 			balancePlayer2before = balancePlayer2after;
 			
-			await instance.buyTicket(7, {from: Player3,value: await web3.utils.toWei('2.0', "ether")});
+			await instance.buyTicket(7, "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac0",{from: Player3,value: await web3.utils.toWei('2.0', "ether")});
 			balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 2);
 			balancePlayer3before = balancePlayer3after;
