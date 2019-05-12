@@ -7,6 +7,6 @@ contract Oracle_Simple {
     }
 
     function getRandom(uint16 mod) external view returns (uint256) {
-       return uint256(keccak256(abi.encodePacked(blockhash(block.number),keccak256(abi.encodePacked(block.difficulty)))))%mod;
+       return uint256(keccak256(abi.encodePacked(blockhash(block.number-1),keccak256(abi.encodePacked(block.difficulty)))))%mod;
     }
 }
