@@ -60,9 +60,9 @@ contract("Full Run Test", async function(accounts) {
       
       await oracleInstance.startNewCampaign(3,3, await web3.utils.toWei('1.0', "ether"),100);
       
-      await oracleInstance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
+      await oracleInstance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", Player1, {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
       
-      await oracleInstance.commit(campaign,"0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('1.0', "ether")});			
+      await oracleInstance.commit(campaign,"0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", Player2, {from: Player2,value: await web3.utils.toWei('1.0', "ether")});			
 
       await oracleInstance.reveal(campaign,"1", {from: Player1});
       

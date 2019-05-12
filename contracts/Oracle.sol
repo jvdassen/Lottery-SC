@@ -58,25 +58,26 @@ contract Oracle {
 
 	event LogCommit(uint256 indexed CampaignId, address indexed from, bytes32 commitment);
 
-    function commit(uint256 campaignId, bytes32 hashedSecret) external
+    function commit(uint256 campaignId, bytes32 hashedSecret, address payable author) external
     notBeBlank(hashedSecret) payable {
         Campaign storage c = campaigns[campaignId];
         if (msg.value < c.minimumFunding) revert("Please provide the necessary funds");
         if (block.number >= c.commitDeadline) revert("Commitphase is already over");
         c.deposit += msg.value;
-        commitmentCampaign(campaignId, hashedSecret, c);
+        commitmentCampaign(campaignId, hashedSecret, c, author);
     }
 
 	function commitmentCampaign(
         uint256 campaignId,
         bytes32 hashedSecret,
-        Campaign storage c
+        Campaign storage c,
+        address payable author
     )internal
-    beBlank(c.participants[msg.sender].commitment) {
-        c.participants[msg.sender] = Participant("", hashedSecret, false);
-        c.addressesOfParticipants.push(msg.sender);
+    beBlank(c.participants[author].commitment) {
+        c.participants[author] = Participant("", hashedSecret, false);
+        c.addressesOfParticipants.push(author);
         c.commitNum++;
-         emit LogCommit(campaignId, msg.sender, hashedSecret);
+        emit LogCommit(campaignId, author, hashedSecret);
     }
 
 	event LogReveal(uint256 indexed CampaignId, address indexed from, string secret);
