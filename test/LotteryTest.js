@@ -13,6 +13,7 @@ contract("Lottery test", async function(accounts) {
 	var Player2 = accounts[1];
 	var Player3 = accounts[2];
 	var Player4 = accounts[3];
+  /*
 		it("LotteryWithoutRandomWith2WinnersOutOfThreePlayers", async function() {
 			var winningNumber = 5;
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
@@ -22,8 +23,7 @@ contract("Lottery test", async function(accounts) {
 			var balancePlayer2after;
 			var balancePlayer3after;
 
-      var numberOfCampaignsCreated = 0;
-      var numberOfCommitsMade = 0;
+      var numberOfCampaignsCreated = 0; var numberOfCommitsMade = 0;
 
       var instance = await Lottery.deployed();
       var oracleInstance = await Oracle.deployed();
@@ -133,5 +133,102 @@ contract("Lottery test", async function(accounts) {
 			assert.equal(Math.round(balancePlayer2after), Math.round(balancePlayer2before) + 18);
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before));
 			});
+		});	
+    */
+		it("Lottery and Oracle Integration", async function() {
+			var winningNumber = 5;
+			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+			var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+			var balancePlayer1after;
+			var balancePlayer2after;
+			var balancePlayer3after;
+
+      var numberOfCampaignsCreated = 0;
+      var numberOfCommitsMade = 0;
+
+      var lottery = await Lottery.deployed();
+      var oracle = await Oracle.deployed();
+      var campaign;
+      oracle.LogCampaignAdded(function(error, response) {
+        if (!error) {
+          numberOfCampaignsCreated++;
+          campaign = response.args.campaignID
+          //Address = response.args.addr;
+        }else{
+          console.log(error);
+        }
+      });
+      oracle.LogCommit(function(error, response) {
+        if (!error) {
+          numberOfCommitsMade++;
+          //Address = response.args.addr;
+        }else{
+          console.log(error);
+        }
+      });
+
+      var reveal = oracle.LogReveal(function(error, response) {
+        if (!error) {
+          console.log(response);
+          //Address = response.args.addr;
+        }else{
+          console.log(error);
+        }
+      });
+
+      var random = oracle.LogRandom(function(error, response) {
+        if (!error) {
+          //console.log(response);
+          rand = response.args.random;
+        }else{
+          console.log(error);
+        }
+      });
+
+        console.log(balancePlayer1before, balancePlayer2before, balancePlayer3before)
+      
+        await lottery.buyTicket(10, "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('4.0', "ether")});
+        balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+        assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 4);
+        balancePlayer1before = balancePlayer1after;
+        
+        await lottery.buyTicket(7, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
+        balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+        assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 4);
+        balancePlayer2before = balancePlayer2after;
+        
+        await lottery.buyTicket(7, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
+        balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+        assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 4);
+        balancePlayer3before = balancePlayer3after;
+
+
+
+      console.log(campaign)
+        
+			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+			var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+
+        await oracle.reveal(campaign,"1", {from: Player1});
+        await oracle.reveal(campaign,"dominik", {from: Player2});
+        await oracle.reveal(campaign,"helo", {from: Player3});
+
+        var rand = await oracle.getRandom(campaign);
+      console.log(rand)
+        // This would be called from the Oracle!
+        // await instance.closeLotteryIfApplicable(5)
+        
+        balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
+        balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+        balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
+        assert.equal(numberOfCampaignsCreated, 1);
+        assert.equal(numberOfCommitsMade, 3);
+        
+      var oracleFee = 1;
+        assert.equal(Math.round(balancePlayer1after)-oracleFee, Math.round(balancePlayer1before));
+        assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before) + 4);
+        assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 4);
 		});	
 });

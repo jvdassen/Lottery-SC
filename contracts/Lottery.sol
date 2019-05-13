@@ -12,6 +12,8 @@ contract Lottery {
     uint256 numberOfWinners = 0;
     uint256 campaignId = 0;
     address oracleAddress;
+
+    uint16 nrOfUsers = 3;
     
     struct State {
         bool open;
@@ -49,7 +51,7 @@ contract Lottery {
     }
 
     function startNewCampaign () private {
-        lotteryState.campaignID = Oracle(oracleAddress).startNewCampaign(10, 10, 100, 10);
+        lotteryState.campaignID = Oracle(oracleAddress).startNewCampaign(3, 3, 100, 10);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
@@ -67,7 +69,7 @@ contract Lottery {
         return found;
     }
     
-    function computeWinners (uint64 lotteryResult) private {
+    function computeWinners (uint256 lotteryResult) private {
         for (uint64 ticketIndex = 0; ticketIndex < numberOfTickets; ticketIndex++) {
             if(tickets[ticketIndex].number == lotteryResult) {
                 winners.push(tickets[ticketIndex].sender);
@@ -107,10 +109,10 @@ contract Lottery {
         
     }
     
-    function closeLotteryIfApplicable (uint64 winningNumber) public {
+    function closeLotteryIfApplicable (uint256 winningNumber) public {
         // TODO do this e.g. after N blocks
         //if(ticketNumbers.length == lotteryState.maxNumber && msg.sender == oracleAddress|| true) {
-        if(ticketNumbers.length == 3) {
+        if(ticketNumbers.length == nrOfUsers) {
           lotteryState.open = false;
           // TODO: input variable should be random computed with the oracle of compute winners
           computeWinners(winningNumber);
@@ -134,7 +136,7 @@ contract Lottery {
 
     }
 
-    function getCampaignId () public returns(uint256) {
+    function getCampaignID () public returns(uint256) {
        return lotteryState.campaignID;
     }
     

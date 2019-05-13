@@ -3,7 +3,7 @@ var Oracle = artifacts.require("./Oracle.sol");
 var Oracle_Simple = artifacts.require("./Oracle_Simple.sol");
 var Lottery = artifacts.require("./Lottery.sol");
 let catchRevert = require("./Exceptions.js").catchRevert;
-
+/*
 contract("Full Run Test", async function(accounts) {
 	
 	var campaign;
@@ -80,7 +80,6 @@ contract("Full Run Test", async function(accounts) {
 
 
     it("Instantiation", async function() {
-        /*
 		return await Lottery.deployed().then(async function(instance) {          
 
 			return await IActor.at(TargetAddress).then(async function(owner) { 
@@ -88,10 +87,10 @@ contract("Full Run Test", async function(accounts) {
 			});
 
 		});
-		*/
     });
 	
 });
+*/
 
 
 function addition(a,b){

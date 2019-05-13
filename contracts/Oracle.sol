@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+import {Lottery} from './Lottery.sol';
+
 contract Oracle {
 
     constructor () public payable{
@@ -124,6 +126,7 @@ contract Oracle {
                 c.settled = true;
                 c.result = uint256(c.random) % c.modulo;
                 emit LogRandom(c.id, c.result);
+                Lottery(c.owner).closeLotteryIfApplicable(c.result);
                 returnFunds(c);
                 return c.result;
             }else {
