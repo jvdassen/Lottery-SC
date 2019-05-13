@@ -18,6 +18,7 @@ contract Lottery {
         uint8 round;
         uint64 maxNumber;
         uint256 ticketPrice;
+        uint256 oracleCost;
         uint256 campaignID;
     }
      
@@ -27,14 +28,14 @@ contract Lottery {
         bytes32 hashedSecret;
     }
     
-    constructor (uint64 maxNum, uint256 price, address oracleInstanceAddress) public {
-        lotteryState = State(true, 0, maxNum, price, 0);
+    constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
+        lotteryState = State(true, 0, maxNum, price, oracleCost, 0);
         oracleAddress = oracleInstanceAddress;
     }
     
     function buyTicket (uint64 numberForTicket, bytes32 hashedSecret) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
         require(
-            msg.value >= lotteryState.ticketPrice,
+            msg.value >= lotteryState.ticketPrice + lotteryState.oracleCost,
             "Not enough Ether provided."
         );
         if(ticketNumbers.length == 0) {
@@ -44,6 +45,7 @@ contract Lottery {
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender, hashedSecret);
         totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
         ticketNumbers.push(numberForTicket);
+        //closeLotteryIfApplicable(5);
     }
 
     function startNewCampaign () private {
@@ -51,7 +53,7 @@ contract Lottery {
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
-        Oracle(oracleAddress).commit.value(msg.value / 2)(lotteryState.campaignID, hashedSecret, msg.sender);
+        Oracle(oracleAddress).commit.value(lotteryState.oracleCost)(lotteryState.campaignID, hashedSecret, msg.sender);
     }
     
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
@@ -81,7 +83,7 @@ contract Lottery {
                 
             } else {
                 // one or more persons claimed the price -> pay them and reset the lottery
-                uint pricePerWinner = (totalPriceMoney/3) / numberOfWinners;
+                uint pricePerWinner = (totalPriceMoney) / numberOfWinners;
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
@@ -108,7 +110,7 @@ contract Lottery {
     function closeLotteryIfApplicable (uint64 winningNumber) public {
         // TODO do this e.g. after N blocks
         //if(ticketNumbers.length == lotteryState.maxNumber && msg.sender == oracleAddress|| true) {
-        if(true) {
+        if(ticketNumbers.length == 3) {
           lotteryState.open = false;
           // TODO: input variable should be random computed with the oracle of compute winners
           computeWinners(winningNumber);

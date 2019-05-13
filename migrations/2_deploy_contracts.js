@@ -6,6 +6,7 @@ module.exports = async function(deployer) {
   await deployer.deploy(Oracle);
   await deployer.deploy(Oracle_Simple);
   const maxNum = 10;
-  const price = web3.utils.toWei('2.0', "ether");
-  await deployer.deploy(Lottery,maxNum,price, Oracle.address);
+  const price = web3.utils.toWei('3.0', "ether");
+  const oracleCost = web3.utils.toWei('1.0', "ether");
+  await deployer.deploy(Lottery,maxNum,price, oracleCost,Oracle.address);
 };
