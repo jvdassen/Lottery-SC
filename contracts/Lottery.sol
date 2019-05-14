@@ -51,7 +51,7 @@ contract Lottery {
     }
 
     function startNewCampaign () private {
-        lotteryState.campaignID = Oracle(oracleAddress).startNewCampaign(3, 3, 100, 10);
+        lotteryState.campaignID = Oracle(oracleAddress).startNewCampaign(nrOfUsers, nrOfUsers, lotteryState.oracleCost, 10);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
