@@ -134,7 +134,6 @@ contract("Lottery test", async function(accounts) {
 			assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before));
 			});
 		});	
-    */
 		it("Lottery and Oracle Integration", async function() {
 			var winningNumber = 5;
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
@@ -227,4 +226,5 @@ contract("Lottery test", async function(accounts) {
         assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before) + 4);
         assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 4);
 		});	
+  */
 });

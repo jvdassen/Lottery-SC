@@ -8,7 +8,7 @@ var Player2;
 var Player3;
 var Player4;
 
-contract("Lottery test", async function(accounts) {
+contract("Demo", async function(accounts) {
 	
 	var campaign;
 	var rand;
@@ -19,14 +19,14 @@ contract("Lottery test", async function(accounts) {
 	Player3 = accounts[2];
 	Player4 = accounts[3];
 
-  lotteryAndOracle1Winner();
-  //lotteryAndOracl2Winners();
-  //lotteryAndOracle0Winners();
-  //lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
+  oneWinner();
+  twoWinners();
+  noWinners();
+  oneWinnerInSecondRound();
 });
 
-function lotteryAndOracle1Winner () {
-		it("Lottery and Oracle Integration", async function() {
+function oneWinner () {
+		it("One Winner - One Round", async function() {
 			var winningNumber = 5;
 
       var numberOfCampaignsCreated = 0;
@@ -92,8 +92,8 @@ function lotteryAndOracle1Winner () {
         var oracleFee = 1;
 		});	
 }
-function lotteryAndOracl2Winners () {
-		it("Lottery and Oracle Integration", async function() {
+function twoWinners () {
+		it("Two Winners - One Round", async function() {
 			var winningNumber = 5;
 
       var numberOfCampaignsCreated = 0;
@@ -152,8 +152,8 @@ function lotteryAndOracl2Winners () {
 		});	
 }
 
-function lotteryAndOracle0Winners () {
-		it("Lottery and Oracle Integration", async function() {
+function noWinners () {
+		it("No winners - One round", async function() {
 			var winningNumber = 5;
 
       var numberOfCampaignsCreated = 0;
@@ -213,8 +213,8 @@ function lotteryAndOracle0Winners () {
 		});	
 }
 
-function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
-		it("Lottery and Oracle Integration", async function() {
+function oneWinnerInSecondRound () {
+		it("0 Winners First Round - 1 Winner Second Round", async function() {
 			var winningNumber = 5;
 
       var numberOfCampaignsCreated = 0;
