@@ -170,7 +170,7 @@ contract("Lottery test", async function(accounts) {
 
       var reveal = oracle.LogReveal(function(error, response) {
         if (!error) {
-          console.log(response);
+          //console.log(response);
           //Address = response.args.addr;
         }else{
           console.log(error);
@@ -186,7 +186,7 @@ contract("Lottery test", async function(accounts) {
         }
       });
 
-        console.log(balancePlayer1before, balancePlayer2before, balancePlayer3before)
+        //console.log(balancePlayer1before, balancePlayer2before, balancePlayer3before)
       
         await lottery.buyTicket(10, "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", {from: Player1,value: await web3.utils.toWei('4.0', "ether")});
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
@@ -205,7 +205,6 @@ contract("Lottery test", async function(accounts) {
 
 
 
-      console.log(campaign)
         
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -216,9 +215,6 @@ contract("Lottery test", async function(accounts) {
         await oracle.reveal(campaign,"helo", {from: Player3});
 
         var rand = await oracle.getRandom(campaign);
-      console.log(rand)
-        // This would be called from the Oracle!
-        // await instance.closeLotteryIfApplicable(5)
         
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
         balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');

@@ -78,7 +78,7 @@ contract Lottery {
         numberOfWinners = winners.length;
     }
     
-    function payOut () private lotteryIsClosed() {
+    function payOut (uint256 winningNumber) private lotteryIsClosed() {
             if(numberOfWinners == 0) {
                 //no one claimed the price money -> reset ticket purchases but keep payOut
                 resetTicketPurchases();
@@ -93,6 +93,7 @@ contract Lottery {
                 totalPriceMoney = 0;
                 resetLotteryCompletely();
             }
+            emit LotteryEnd(winningNumber, winners, totalPriceMoney);
             lotteryState.open = true;
     }
     
@@ -116,9 +117,11 @@ contract Lottery {
           lotteryState.open = false;
           // TODO: input variable should be random computed with the oracle of compute winners
           computeWinners(winningNumber);
-          payOut();
+          payOut(winningNumber);
         }
     }
+
+    event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot);
     
     function resetTicketPurchases () private {
             //Configuration lotteryState;
