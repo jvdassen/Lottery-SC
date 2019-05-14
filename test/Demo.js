@@ -20,9 +20,9 @@ contract("Demo", async function(accounts) {
 	Player4 = accounts[3];
 
   oneWinner();
-  twoWinners();
-  noWinners();
-  oneWinnerInSecondRound();
+  //twoWinners();
+  //noWinners();
+  //oneWinnerInSecondRound();
 });
 
 function oneWinner () {
@@ -77,10 +77,6 @@ function oneWinner () {
         await lottery.buyTicket(4, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
         
         await lottery.buyTicket(7, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
-
-
-
-        
 
         await oracle.reveal(campaign,"1", {from: Player1});
         await oracle.reveal(campaign,"dominik", {from: Player2});
