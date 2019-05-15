@@ -135,8 +135,7 @@ contract("Lottery test", async function(accounts) {
 			});
 		});	
     */
-		it("Lottery and Oracle Integration Lt", async function() {
-			var winningNumber = 5;
+	/*	it("Lottery and Oracle Integration Lt", async function() {
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
 			var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
@@ -147,7 +146,6 @@ contract("Lottery test", async function(accounts) {
       var numberOfCommitsMade = 0;
       var lottery = await Lottery.deployed();
       var oracle = await Oracle.deployed();
-      var campaign;
      
       oracle.LogCommit(function(error, response) {
         if (!error) {
@@ -158,7 +156,7 @@ contract("Lottery test", async function(accounts) {
         }
       });
 
-      var reveal = oracle.LogReveal(function(error, response) {
+      oracle.LogReveal(function(error, response) {
         if (!error) {
           //console.log(response);
           //Address = response.args.addr;
@@ -202,10 +200,6 @@ contract("Lottery test", async function(accounts) {
           assert.equal("Secret is not the same", error.reason)
         }
         await oracle.reveal(0,"helo", {from: Player3});
-
-
-        //var rand = await oracle.getRandom();
-        console.log("Die Gewinnzahl ist : " + rand);
         
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
         balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -215,5 +209,5 @@ contract("Lottery test", async function(accounts) {
         assert.equal(Math.round(balancePlayer1after)-oracleFee, Math.round(balancePlayer1before));
         assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before));
         assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 9);
-		});	
+		});	*/
 });
