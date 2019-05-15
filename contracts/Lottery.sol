@@ -10,7 +10,6 @@ contract Lottery {
     uint64[] ticketNumbers;
     address payable[] winners;
     uint256 numberOfWinners = 0;
-    uint256 campaignId = 0;
     address oracleAddress;
 
     uint16 nrOfUsers = 3;
@@ -21,7 +20,6 @@ contract Lottery {
         uint64 maxNumber;
         uint256 ticketPrice;
         uint256 oracleCost;
-        uint256 campaignID;
     }
 
     struct Ticket {
@@ -31,7 +29,7 @@ contract Lottery {
     }
 
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
-        lotteryState = State(true, 0, maxNum, price, oracleCost, 0);
+        lotteryState = State(true, 0, maxNum, price, oracleCost);
         oracleAddress = oracleInstanceAddress;
     }
 
@@ -51,11 +49,11 @@ contract Lottery {
     }
 
     function startNewCampaign () private {
-        lotteryState.campaignID = Oracle(oracleAddress).startNewCampaign(nrOfUsers, nrOfUsers, lotteryState.oracleCost, 10);
+        Oracle(oracleAddress).startOrUpdateCampaign(nrOfUsers, nrOfUsers, lotteryState.oracleCost, 10);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
-        Oracle(oracleAddress).commit.value(lotteryState.oracleCost)(lotteryState.campaignID, hashedSecret, msg.sender);
+        Oracle(oracleAddress).commit.value(lotteryState.oracleCost)(hashedSecret, msg.sender);
     }
 
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {

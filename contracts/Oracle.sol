@@ -27,7 +27,6 @@ contract Oracle {
     modifier beFalse(bool _t) {if (_t) revert("Should be false but is true"); _;}
 
 	struct Campaign {
-		uint256 id;
         address owner;
         uint256 deposit;
         uint16  modulo;
@@ -44,32 +43,33 @@ contract Oracle {
 	}
 
 
-	function startNewCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public returns(uint256){
+	function startOrUpdateCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public returns(uint256){
 
-		uint256 campaginId = 0;
         c.commitDeadline = block.number+commitDuration;
         c.revealDeadline = c.commitDeadline+revealDuration;
         c.minimumFunding = minimumFunding;
         c.modulo = modulo;
         c.owner = msg.sender;
-		c.id = campaginId;
-		emit LogCampaignAdded(campaginId);
-        return campaginId;
+        c.commitNum = 0;
+        c.revealsNum = 0;
+        c.deposit = 0;
+        c.settled = false;
+        c.random = 0;
+        return 0;
     }
 
 	event LogCommit(address indexed from, bytes32 commitment);
 
-    function commit(uint256 campaignId, bytes32 hashedSecret, address payable author) external
+    function commit(bytes32 hashedSecret, address payable author) external
     notBeBlank(hashedSecret) payable {
         if (msg.value < c.minimumFunding) revert("Please provide the necessary funds");
         if (block.number >= c.commitDeadline) revert("Commitphase is already over");
         c.deposit += msg.value;
-        commitmentCampaign(hashedSecret, c, author);
+        commitmentCampaign(hashedSecret, author);
     }
 
 	function commitmentCampaign(
         bytes32 hashedSecret,
-        Campaign storage c,
         address payable author
     )internal
     beBlank(c.participants[author].commitment) {
@@ -79,13 +79,13 @@ contract Oracle {
         emit LogCommit(author, hashedSecret);
     }
 
-	event LogReveal(uint256 indexed CampaignId, address indexed from, string secret);
+	event LogReveal(address indexed from, string secret);
 
     function reveal(uint256 campaignId, string calldata secret) external {
         Participant storage p = c.participants[msg.sender];
        // if (block.number >= c.revealDeadline) revert("Revealphase is already over");
         if (block.number < c.commitDeadline) revert("Commitphase not over yet");
-        revealCampaign(campaignId, secret, c, p);
+        revealCampaign(secret, p);
     }
 
     modifier checkSecret(string memory secret, bytes32 _commitment) {
@@ -94,9 +94,7 @@ contract Oracle {
     }
 
     function revealCampaign(
-        uint256 campaignId,
         string memory secret,
-        Campaign storage c,
         Participant storage p
     ) internal
     checkSecret(secret, p.commitment)
@@ -106,37 +104,47 @@ contract Oracle {
         p.revealed = true;
         c.revealsNum++;
         c.random ^= keccak256(abi.encodePacked(secret,msg.sender));
-        emit LogReveal(campaignId, msg.sender, secret);
+        emit LogReveal(msg.sender, secret);
         if(c.revealsNum == c.commitNum){
-            returnRandom(c);
+            returnRandom();
         }
     }
 
-    event LogRandom(uint256 indexed CampaignId, uint256 random);
+    event LogRandom(uint256 random);
 
-    function getRandom(uint256 campaignId) external returns (uint256) {
-        if(c.settled==true){return c.result;}else{return returnRandom(c);}
+    function getRandom() external returns (uint256) {
+        if(c.settled==true){return c.result;}else{return returnRandom();}
     }
 
-    function returnRandom(Campaign storage c) internal returns (uint256) {
+    function returnRandom() internal returns (uint256) {
         //TODOif(block.number >= c.revealDeadline){
             if (c.revealsNum == c.commitNum) {
                 c.settled = true;
                 c.result = uint256(c.random) % c.modulo;
-                emit LogRandom(c.id, c.result);
+                emit LogRandom(c.result);
                 Lottery(c.owner).closeLotteryIfApplicable(c.result);
-                returnFunds(c);
+                returnFunds();
+                //reset participants
+                resetParticipants();
                 return c.result;
             }else {
-                returnFunds(c);
+                returnFunds();
                 revert("Not everyone has commited");
             }
+
         /*}else{
             revert("Please wait until the end of the reveal phase");
         }*/
     }
 
-    function returnFunds(Campaign storage c) internal {
+    function resetParticipants() internal{
+        for(uint256 i = 0; i < c.addressesOfParticipants.length; i++){
+             delete c.participants[c.addressesOfParticipants[i]];
+        }
+        delete c.addressesOfParticipants;
+    }
+
+    function returnFunds() internal {
         for(uint i = 0; i < c.addressesOfParticipants.length; i++) {
             if(c.participants[c.addressesOfParticipants[i]].revealed == true){
                 c.addressesOfParticipants[i].transfer(c.deposit/c.revealsNum);

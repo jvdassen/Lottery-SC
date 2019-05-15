@@ -144,20 +144,11 @@ contract("Lottery test", async function(accounts) {
 			var balancePlayer2after;
 			var balancePlayer3after;
 
-      var numberOfCampaignsCreated = 0;
       var numberOfCommitsMade = 0;
       var lottery = await Lottery.deployed();
       var oracle = await Oracle.deployed();
       var campaign;
-      oracle.LogCampaignAdded(function(error, response) {
-        if (!error) {
-          numberOfCampaignsCreated++;
-          campaign = response.args.campaignID;
-          //Address = response.args.addr;
-        }else{
-          console.log(error);
-        }
-      });
+     
       oracle.LogCommit(function(error, response) {
         if (!error) {
           numberOfCommitsMade++;
@@ -213,7 +204,7 @@ contract("Lottery test", async function(accounts) {
         await oracle.reveal(0,"helo", {from: Player3});
 
 
-        //var rand = await oracle.getRandom(campaign);
+        //var rand = await oracle.getRandom();
         console.log("Die Gewinnzahl ist : " + rand);
         
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');

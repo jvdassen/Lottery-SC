@@ -82,11 +82,11 @@ function lotteryAndOracle1Winner () {
 
         
 
-        await oracle.reveal(campaign,"1", {from: Player1});
-        await oracle.reveal(campaign,"dominik", {from: Player2});
-        await oracle.reveal(campaign,"helo", {from: Player3});
+        await oracle.reveal("1", {from: Player1});
+        await oracle.reveal("dominik", {from: Player2});
+        await oracle.reveal("helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+        var rand = await oracle.getRandom();
         
         
         var oracleFee = 1;
@@ -144,11 +144,11 @@ function lotteryAndOracl2Winners () {
         
         await lottery.buyTicket(7, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
 
-        await oracle.reveal(campaign,"1", {from: Player1});
-        await oracle.reveal(campaign,"dominik", {from: Player2});
-        await oracle.reveal(campaign,"helo", {from: Player3});
+        await oracle.reveal("1", {from: Player1});
+        await oracle.reveal("dominik", {from: Player2});
+        await oracle.reveal("helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+        var rand = await oracle.getRandom();
 		});	
 }
 
@@ -205,11 +205,11 @@ function lotteryAndOracle0Winners () {
         
         await lottery.buyTicket(3, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
 
-        await oracle.reveal(campaign,"1", {from: Player1});
-        await oracle.reveal(campaign,"dominik", {from: Player2});
-        await oracle.reveal(campaign,"helo", {from: Player3});
+        await oracle.reveal("1", {from: Player1});
+        await oracle.reveal("dominik", {from: Player2});
+        await oracle.reveal("helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+        var rand = await oracle.getRandom();
 		});	
 }
 
@@ -265,11 +265,11 @@ function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
         await lottery.buyTicket(5, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
 
 
-        await oracle.reveal(campaign,"1", {from: Player1});
-        await oracle.reveal(campaign,"dominik", {from: Player2});
-        await oracle.reveal(campaign,"helo", {from: Player3});
+        await oracle.reveal("1", {from: Player1});
+        await oracle.reveal("dominik", {from: Player2});
+        await oracle.reveal("helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+        var rand = await oracle.getRandom();
         
         var oracleFee = 1;
       await timeout(3000);
@@ -279,11 +279,11 @@ function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
         
         await lottery.buyTicket(7, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
 
-        await oracle.reveal(campaign,"1", {from: Player1});
-        await oracle.reveal(campaign,"dominik", {from: Player2});
-        await oracle.reveal(campaign,"helo", {from: Player3});
+        await oracle.reveal("1", {from: Player1});
+        await oracle.reveal("dominik", {from: Player2});
+        await oracle.reveal("helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+        var rand = await oracle.getRandom();
         
 		});	
 }
