@@ -8,7 +8,7 @@ contract Oracle {
 
     }
 
-	Campaign[] public campaigns;
+	Campaign public c;
 
     struct Participant {
         string    secret;
@@ -46,8 +46,7 @@ contract Oracle {
 
 	function startNewCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public returns(uint256){
 
-		uint256 campaginId = campaigns.length++;
-		Campaign storage c = campaigns[campaginId];
+		uint256 campaginId = 0;
         c.commitDeadline = block.number+commitDuration;
         c.revealDeadline = c.commitDeadline+revealDuration;
         c.minimumFunding = minimumFunding;
@@ -58,19 +57,17 @@ contract Oracle {
         return campaginId;
     }
 
-	event LogCommit(uint256 indexed CampaignId, address indexed from, bytes32 commitment);
+	event LogCommit(address indexed from, bytes32 commitment);
 
     function commit(uint256 campaignId, bytes32 hashedSecret, address payable author) external
     notBeBlank(hashedSecret) payable {
-        Campaign storage c = campaigns[campaignId];
         if (msg.value < c.minimumFunding) revert("Please provide the necessary funds");
         if (block.number >= c.commitDeadline) revert("Commitphase is already over");
         c.deposit += msg.value;
-        commitmentCampaign(campaignId, hashedSecret, c, author);
+        commitmentCampaign(hashedSecret, c, author);
     }
 
 	function commitmentCampaign(
-        uint256 campaignId,
         bytes32 hashedSecret,
         Campaign storage c,
         address payable author
@@ -79,13 +76,12 @@ contract Oracle {
         c.participants[author] = Participant("", hashedSecret, false);
         c.addressesOfParticipants.push(author);
         c.commitNum++;
-        emit LogCommit(campaignId, author, hashedSecret);
+        emit LogCommit(author, hashedSecret);
     }
 
 	event LogReveal(uint256 indexed CampaignId, address indexed from, string secret);
 
     function reveal(uint256 campaignId, string calldata secret) external {
-        Campaign storage c = campaigns[campaignId];
         Participant storage p = c.participants[msg.sender];
        // if (block.number >= c.revealDeadline) revert("Revealphase is already over");
         if (block.number < c.commitDeadline) revert("Commitphase not over yet");
@@ -119,7 +115,6 @@ contract Oracle {
     event LogRandom(uint256 indexed CampaignId, uint256 random);
 
     function getRandom(uint256 campaignId) external returns (uint256) {
-        Campaign storage c = campaigns[campaignId];
         if(c.settled==true){return c.result;}else{return returnRandom(c);}
     }
 

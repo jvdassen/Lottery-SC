@@ -40,7 +40,7 @@ contract Lottery {
             msg.value >= lotteryState.ticketPrice + lotteryState.oracleCost,
             "Not enough Ether provided."
         );
-        if(ticketNumbers.length == 0) {
+        if(numberOfTickets == 0) {
           startNewCampaign();
         }
         forwardSecret(hashedSecret);
@@ -118,10 +118,6 @@ contract Lottery {
             delete ticketNumbers;
             delete winners;
             numberOfWinners = 0;
-    }
-
-    function getCampaignID () public returns(uint256) {
-       return lotteryState.campaignID;
     }
 
     modifier lotteryIsOpen () {
