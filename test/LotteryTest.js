@@ -135,7 +135,7 @@ contract("Lottery test", async function(accounts) {
 			});
 		});	
     */
-		it("Lottery and Oracle Integration", async function() {
+		it("Lottery and Oracle Integration Lt", async function() {
 			var winningNumber = 5;
 			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -193,28 +193,29 @@ contract("Lottery test", async function(accounts) {
         assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 4);
         balancePlayer1before = balancePlayer1after;
         
-        await lottery.buyTicket(7, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
+        await lottery.buyTicket(3, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
         balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
         assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 4);
         balancePlayer2before = balancePlayer2after;
         
-        await lottery.buyTicket(7, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
+        await lottery.buyTicket(6, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
         balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
         assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 4);
         balancePlayer3before = balancePlayer3after;
 
 
-
-        
-			var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
-			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
-			var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
-
         await oracle.reveal(campaign,"1", {from: Player1});
         await oracle.reveal(campaign,"dominik", {from: Player2});
+        try {
+          await oracle.reveal(campaign,"hello", {from: Player3});
+        } catch (error) {
+          assert.equal("Secret is not the same", error.reason)
+        }
         await oracle.reveal(campaign,"helo", {from: Player3});
 
-        var rand = await oracle.getRandom(campaign);
+
+        //var rand = await oracle.getRandom(campaign);
+        console.log("Die Gewinnzahl ist : " + rand);
         
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
         balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -224,7 +225,7 @@ contract("Lottery test", async function(accounts) {
         
       var oracleFee = 1;
         assert.equal(Math.round(balancePlayer1after)-oracleFee, Math.round(balancePlayer1before));
-        assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before) + 4);
-        assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 4);
+        assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before));
+        assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 9);
 		});	
 });

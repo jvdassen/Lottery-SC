@@ -14,7 +14,7 @@ contract Lottery {
     address oracleAddress;
 
     uint16 nrOfUsers = 3;
-    
+
     struct State {
         bool open;
         uint8 round;
@@ -23,18 +23,18 @@ contract Lottery {
         uint256 oracleCost;
         uint256 campaignID;
     }
-     
+
     struct Ticket {
         uint64 number;
         address payable sender;
         bytes32 hashedSecret;
     }
-    
+
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
         lotteryState = State(true, 0, maxNum, price, oracleCost, 0);
         oracleAddress = oracleInstanceAddress;
     }
-    
+
     function buyTicket (uint64 numberForTicket, bytes32 hashedSecret) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
         require(
             msg.value >= lotteryState.ticketPrice + lotteryState.oracleCost,
@@ -57,7 +57,7 @@ contract Lottery {
     function forwardSecret (bytes32 hashedSecret) private {
         Oracle(oracleAddress).commit.value(lotteryState.oracleCost)(lotteryState.campaignID, hashedSecret, msg.sender);
     }
-    
+
     function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
         bool found = false;
         for(uint64 i = 0; i < ticketNumbers.length; i++) {
@@ -68,7 +68,7 @@ contract Lottery {
         }
         return found;
     }
-    
+
     function computeWinners (uint256 lotteryResult) private {
         for (uint64 ticketIndex = 0; ticketIndex < numberOfTickets; ticketIndex++) {
             if(tickets[ticketIndex].number == lotteryResult) {
@@ -77,82 +77,53 @@ contract Lottery {
         }
         numberOfWinners = winners.length;
     }
-    
+
     function payOut (uint256 winningNumber) private lotteryIsClosed() {
-            if(numberOfWinners == 0) {
-                //no one claimed the price money -> reset ticket purchases but keep payOut
-                resetTicketPurchases();
-                
-            } else {
-                // one or more persons claimed the price -> pay them and reset the lottery
+            if(numberOfWinners >= 1) {
+                // one or more persons claimed the price -> pay them and reset the checkpot
                 uint pricePerWinner = (totalPriceMoney) / numberOfWinners;
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
                 }
                 totalPriceMoney = 0;
-                resetLotteryCompletely();
             }
             emit LotteryEnd(winningNumber, winners, totalPriceMoney);
+            // reset ticket purchases at the end of a lottery round
+            resetTicketPurchases();
             lotteryState.open = true;
     }
-    
-    function resetLotteryCompletely () private lotteryIsClosed() {
-        resetTicketPurchases();
-        resetLotteryState();
-    }
-    
-    function resetLotteryState () private {
 
-    }
-    
-    function queryLotteryNumberFromOracle () private {
-        
-    }
-    
+
     function closeLotteryIfApplicable (uint256 winningNumber) public {
         // TODO do this e.g. after N blocks
         //if(ticketNumbers.length == lotteryState.maxNumber && msg.sender == oracleAddress|| true) {
         if(ticketNumbers.length == nrOfUsers) {
           lotteryState.open = false;
-          // TODO: input variable should be random computed with the oracle of compute winners
+          // check for the winners and pay them out
           computeWinners(winningNumber);
           payOut(winningNumber);
         }
     }
 
     event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot);
-    
+
     function resetTicketPurchases () private {
-            //Configuration lotteryState;
             //delete tickets
             for(uint64 i = 0; i < numberOfTickets; i++){
                 delete tickets[numberOfTickets];
             }
+            //Configuration lotteryState;
             numberOfTickets = 0;
             delete ticketNumbers;
             delete winners;
             numberOfWinners = 0;
     }
 
-    function getNrTickets () public returns(uint) {
-
-    }
-
     function getCampaignID () public returns(uint256) {
        return lotteryState.campaignID;
     }
-    
-    modifier costs(uint _amount) {
-        require(
-            msg.value >= _amount,
-            "Not enough Ether provided."
-        );
-        _;
-        /*if (msg.value > _amount)
-            msg.sender.transfer(msg.value - _amount);*/
-    }
-    
+
     modifier lotteryIsOpen () {
         require(
             lotteryState.open,

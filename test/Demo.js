@@ -19,7 +19,7 @@ contract("Lottery test", async function(accounts) {
 	Player3 = accounts[2];
 	Player4 = accounts[3];
 
-  lotteryAndOracle1Winner();
+  //lotteryAndOracle1Winner();
   //lotteryAndOracl2Winners();
   //lotteryAndOracle0Winners();
   //lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();

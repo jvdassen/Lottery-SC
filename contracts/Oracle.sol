@@ -87,7 +87,7 @@ contract Oracle {
     function reveal(uint256 campaignId, string calldata secret) external {
         Campaign storage c = campaigns[campaignId];
         Participant storage p = c.participants[msg.sender];
-        if (block.number >= c.revealDeadline) revert("Revealphase is already over");
+       // if (block.number >= c.revealDeadline) revert("Revealphase is already over");
         if (block.number < c.commitDeadline) revert("Commitphase not over yet");
         revealCampaign(campaignId, secret, c, p);
     }
@@ -111,6 +111,9 @@ contract Oracle {
         c.revealsNum++;
         c.random ^= keccak256(abi.encodePacked(secret,msg.sender));
         emit LogReveal(campaignId, msg.sender, secret);
+        if(c.revealsNum == c.commitNum){
+            returnRandom(c);
+        }
     }
 
     event LogRandom(uint256 indexed CampaignId, uint256 random);
@@ -121,7 +124,7 @@ contract Oracle {
     }
 
     function returnRandom(Campaign storage c) internal returns (uint256) {
-        if(block.number >= c.revealDeadline){
+        //TODOif(block.number >= c.revealDeadline){
             if (c.revealsNum == c.commitNum) {
                 c.settled = true;
                 c.result = uint256(c.random) % c.modulo;
@@ -133,9 +136,9 @@ contract Oracle {
                 returnFunds(c);
                 revert("Not everyone has commited");
             }
-        }else{
+        /*}else{
             revert("Please wait until the end of the reveal phase");
-        }
+        }*/
     }
 
     function returnFunds(Campaign storage c) internal {
