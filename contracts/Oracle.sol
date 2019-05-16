@@ -8,7 +8,7 @@ contract Oracle {
 
     }
 
-	Campaign public c;
+	State public c;
 
     struct Participant {
         string    secret;
@@ -22,7 +22,7 @@ contract Oracle {
 
     modifier beFalse(bool _t) {if (_t) revert("Should be false but is true"); _;}
 
-	struct Campaign {
+	struct State {
         address owner;
         uint256 deposit;
         uint16  modulo;
