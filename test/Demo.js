@@ -15,10 +15,10 @@ contract("Lottery and Oracle test", async function(accounts) {
 	Player3 = accounts[2];
 
   lotteryAndOracle1Winner();
+  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
+  lotteryAndOracleNotEveryoneRevealed();
   lotteryAndOracl2Winners();
   lotteryAndOracle0Winners();
-  lotteryAndOracleNotEveryoneRevealed();
-  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
 });
 
 function lotteryAndOracle1Winner () {
@@ -82,14 +82,8 @@ function lotteryAndOracle1Winner () {
 
         await oracle.reveal("1", {from: Player1});
         await oracle.reveal("dominik", {from: Player2});
-        // wrong reveal to check
-        try {
-          await oracle.reveal("hello", {from: Player3});
-        } catch (error) {
-          assert.equal("Secret is not the same", error.reason)
-        }
         await oracle.reveal("helo", {from: Player3});
-
+        
         balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
         balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
         balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
