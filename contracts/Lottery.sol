@@ -11,6 +11,7 @@ contract Lottery {
     address payable[] winners;
     uint256 numberOfWinners = 0;
     address oracleAddress;
+    uint16 oracleModulo;
 
     uint16 nrOfSecrets = 3;
 
@@ -26,9 +27,10 @@ contract Lottery {
         address payable sender;
     }
 
-    constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
+    constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress, uint16 modulo) public {
         lotteryState = State(true, maxNum, price, oracleCost);
         oracleAddress = oracleInstanceAddress;
+	oracleModulo = modulo;
     }
 
     function buyTicket (uint64 numberForTicket, bytes32 hashedSecret) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
@@ -60,7 +62,7 @@ contract Lottery {
     }
 
     function startNewCampaign () private {
-        Oracle(oracleAddress).startOrUpdateCampaign(nrOfSecrets, lotteryState.oracleCost, 10);
+        Oracle(oracleAddress).startOrUpdateCampaign(nrOfSecrets, lotteryState.oracleCost, oracleModulo);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {

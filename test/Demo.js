@@ -6,7 +6,7 @@ let catchRevert = require("./Exceptions.js").catchRevert;
 var Player1;
 var Player2;
 var Player3;
-const winningNumber = 8;
+const winningNumber = 0;
 
 contract("Lottery and Oracle test", async function(accounts) {
 	
