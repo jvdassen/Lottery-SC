@@ -16,7 +16,6 @@ contract Lottery {
 
     struct State {
         bool open;
-        uint8 round;
         uint64 maxNumber;
         uint256 ticketPrice;
         uint256 oracleCost;
@@ -29,7 +28,7 @@ contract Lottery {
     }
 
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
-        lotteryState = State(true, 0, maxNum, price, oracleCost);
+        lotteryState = State(true, maxNum, price, oracleCost);
         oracleAddress = oracleInstanceAddress;
     }
 
@@ -45,7 +44,6 @@ contract Lottery {
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender, hashedSecret);
         totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
         ticketNumbers.push(numberForTicket);
-        //closeLotteryIfApplicable(5);
     }
 
     function startNewCampaign () private {
@@ -54,17 +52,6 @@ contract Lottery {
 
     function forwardSecret (bytes32 hashedSecret) private {
         Oracle(oracleAddress).commit.value(lotteryState.oracleCost)(hashedSecret, msg.sender);
-    }
-
-    function numberWasGuessed (uint64 lotteryResult) private view returns (bool) {
-        bool found = false;
-        for(uint64 i = 0; i < ticketNumbers.length; i++) {
-            if(ticketNumbers[i] == lotteryResult) {
-                found = true;
-                return found;
-            }
-        }
-        return found;
     }
 
     function computeWinners (uint256 lotteryResult) private {
@@ -94,8 +81,6 @@ contract Lottery {
 
 
     function closeLotteryIfApplicable (uint256 winningNumber) public {
-        // TODO do this e.g. after N blocks
-        //if(ticketNumbers.length == lotteryState.maxNumber && msg.sender == oracleAddress|| true) {
         if(ticketNumbers.length == nrOfUsers) {
           lotteryState.open = false;
           // check for the winners and pay them out

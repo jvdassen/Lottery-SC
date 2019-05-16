@@ -8,7 +8,6 @@ contract("Lottery test", async function(accounts) {
   var Player1 = accounts[0];
 	var Player2 = accounts[1];
 	var Player3 = accounts[2];
-  var Player4 = accounts[3];
   
   // important: these tests can only work individually, because the participiants aren't reset when the lottery is found,
   // because these these doesn't connect to the lottery, hence when another round is started the oracle crashes.

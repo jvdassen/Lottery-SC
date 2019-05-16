@@ -6,18 +6,12 @@ let catchRevert = require("./Exceptions.js").catchRevert;
 var Player1;
 var Player2;
 var Player3;
-var Player4;
 
-contract("Lottery test", async function(accounts) {
+contract("Lottery and Oracle test", async function(accounts) {
 	
-	var campaign;
-	var rand;
-	var oracleInstance;
-	var lotteryInstance;
   Player1 = accounts[0];
 	Player2 = accounts[1];
 	Player3 = accounts[2];
-	Player4 = accounts[3];
 
   lotteryAndOracle1Winner();
   lotteryAndOracl2Winners();
@@ -61,7 +55,7 @@ function lotteryAndOracle1Winner () {
       var random = oracle.LogRandom(function(error, response) {
         if (!error) {
           //console.log(response);
-          rand = response.args.random;
+          //rand = response.args.random;
         }else{
           console.log(error);
         }

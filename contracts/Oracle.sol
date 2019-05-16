@@ -43,7 +43,7 @@ contract Oracle {
 	}
 
 
-	function startOrUpdateCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public returns(uint256){
+	function startOrUpdateCampaign(uint256 commitDuration, uint16 revealDuration,uint256 minimumFunding,uint16 modulo) public {
 
         c.commitDeadline = block.number+commitDuration;
         c.revealDeadline = c.commitDeadline+revealDuration;
@@ -55,7 +55,6 @@ contract Oracle {
         c.deposit = 0;
         c.settled = false;
         c.random = 0;
-        return 0;
     }
 
 	event LogCommit(address indexed from, bytes32 commitment);
