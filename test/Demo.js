@@ -19,10 +19,10 @@ contract("Lottery test", async function(accounts) {
 	Player3 = accounts[2];
 	Player4 = accounts[3];
 
-  //lotteryAndOracle1Winner();
+  lotteryAndOracle1Winner();
   lotteryAndOracl2Winners();
-  //lotteryAndOracle0Winners();
-  //lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
+  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
+  lotteryAndOracle0Winners();
 });
 
 function lotteryAndOracle1Winner () {
@@ -324,7 +324,6 @@ function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
         await oracle.reveal(0,"helo", {from: Player3});
 
         balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
-        
         assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before)+18);
 		});	
 }
