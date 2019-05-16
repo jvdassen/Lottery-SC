@@ -31,7 +31,6 @@ contract Oracle {
         uint256 numberOfSecrets;
         bytes32 random;
         uint256 result;
-        bool    settled;
         uint32  commitNum;
         uint32  revealsNum;
         uint256  minimumFunding;
@@ -49,7 +48,6 @@ contract Oracle {
         c.commitNum = 0;
         c.revealsNum = 0;
         c.deposit = 0;
-        c.settled = false;
         c.commitPhase = true;
         c.revealPhase = false;
         c.numberOfSecrets = numberOfSecrets;
@@ -84,7 +82,7 @@ contract Oracle {
 
 	event LogReveal(address indexed from, string secret);
 
-    function reveal(uint256 campaignId, string calldata secret) external {
+    function reveal(string calldata secret) external {
         Participant storage p = c.participants[msg.sender];
        // if (block.number >= c.revealDeadline) revert("Revealphase is already over");
         if (!c.revealPhase) revert("Currently the lottery is not in the reveal phase.");
@@ -114,38 +112,34 @@ contract Oracle {
 
     event LogRandom(uint256 random);
 
-    function endLottery() external {
-        if(block.number >= c.earliestEndOfRevealPhase){
-            if(c.settled==true){
-               // return c.result;
-            }else{
-                returnRandom();
-            }
+    function endLottery( ) external {
+        if(block.number > c.earliestEndOfRevealPhase){
+            // not everyone revealed -> return invested ether for this lottery round
+            returnFunds();
+            Lottery(c.owner).returnTicketPrices();
+
+            //reset the commits
+            resetParticipants();
         }else{
-            revert("It is too early to end the lottery. Not everyone had the chance to reveal.");
+            revert("It is too early to end the lottery");
         }
     }
 
     function returnRandom() internal returns (uint256) {
-        //TODOif(block.number >= c.revealDeadline){
-            if (c.revealsNum == c.commitNum) {
-                c.settled = true;
-                c.result = uint256(c.random) % c.modulo;
-                emit LogRandom(c.result);
-                Lottery(c.owner).closeLotteryIfApplicable(c.result);
-                returnFunds();
-                //reset participants
-                resetParticipants();
-                return c.result;
-            }else {
-                returnFunds();
-                Lottery(c.owner).returnTicketPrices();
-                revert("Not everyone has commited");
-            }
-
-        /*}else{
-            revert("Please wait until the end of the reveal phase");
-        }*/
+        if (c.revealsNum == c.commitNum) {
+            // everyone revealed
+            c.result = uint256(c.random) % c.modulo;
+            emit LogRandom(c.result);
+            Lottery(c.owner).closeLotteryIfApplicable(c.result);
+            returnFunds();
+            //reset the participants, that a new lottery round can start
+            resetParticipants();
+             return c.result;
+         }else {
+            // not everyone revealed -> return invested ether for this lottery round
+            returnFunds();
+            Lottery(c.owner).returnTicketPrices();
+        }
     }
 
     function resetParticipants() internal{
