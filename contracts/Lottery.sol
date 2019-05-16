@@ -102,6 +102,16 @@ contract Lottery {
 
     event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot);
 
+    function returnTicketPrices() public {
+        require(
+            msg.sender == oracleAddress,
+            "Only Oracle can repay the ticket prices."
+        );
+        for(uint i = 0; i < numberOfTickets; i++) {
+                tickets[i].sender.transfer(lotteryState.ticketPrice);
+        }
+    }
+
     function resetTicketPurchases () private {
             //delete tickets
             for(uint64 i = 0; i < numberOfTickets; i++){

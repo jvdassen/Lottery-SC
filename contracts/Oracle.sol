@@ -37,6 +37,7 @@ contract Oracle {
         uint32  commitNum;
         uint32  revealsNum;
         uint256  minimumFunding;
+        uint256 earliestEndOfRevealPhase;
 		mapping (address => Participant) participants;
         address payable[]  addressesOfParticipants;
 	}
@@ -79,6 +80,7 @@ contract Oracle {
         if(c.commitNum >= c.numberOfSecrets){
             c.commitPhase = false;
             c.revealPhase = true;
+            c.earliestEndOfRevealPhase = block.number + c.numberOfSecrets;
         }
     }
 
@@ -114,8 +116,16 @@ contract Oracle {
 
     event LogRandom(uint256 random);
 
-    function getRandom() external returns (uint256) {
-        if(c.settled==true){return c.result;}else{return returnRandom();}
+    function endLottery() external {
+        if(block.number >= c.earliestEndOfRevealPhase){
+            if(c.settled==true){
+               // return c.result;
+            }else{
+                returnRandom();
+            }
+        }else{
+            revert("It is too early to end the lottery. Not everyone had the chance to reveal.");
+        }
     }
 
     function returnRandom() internal returns (uint256) {
@@ -131,6 +141,7 @@ contract Oracle {
                 return c.result;
             }else {
                 returnFunds();
+                Lottery(c.owner).returnTicketPrices();
                 revert("Not everyone has commited");
             }
 
