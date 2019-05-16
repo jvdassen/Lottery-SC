@@ -45,12 +45,12 @@ contract Lottery {
         ticketNumbers.push(numberForTicket);
     }
     
-    function buyTicket2 (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
+    function buyCommitfreeTicket (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
         require(
             msg.value >= lotteryState.ticketPrice,
             "Not enough Ether provided."
         );
-        // is it possible to submit no secret for a user?
+        // it is possible to submit no secret for a user
         if(numberOfTickets == 0) {
           startNewCampaign();
         }

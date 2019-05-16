@@ -8,7 +8,7 @@ contract Oracle {
 
     }
 
-	Campaign public c;
+	State public c;
 
     struct Participant {
         string    secret;
@@ -16,15 +16,13 @@ contract Oracle {
         bool      revealed;
     }
 
-	event LogCampaignAdded(uint256 indexed campaignID);
-
     modifier notBeBlank(bytes32 _s) {if (_s == "") revert("Should not be blank but is"); _;}
 
     modifier beBlank(bytes32 _s) {if (_s != "") revert("User allready commited a secret. Secret per user is limited to 1."); _;}
 
     modifier beFalse(bool _t) {if (_t) revert("Should be false but is true"); _;}
 
-	struct Campaign {
+	struct State {
         address owner;
         uint256 deposit;
         uint16  modulo;
