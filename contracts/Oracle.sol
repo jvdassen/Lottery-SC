@@ -117,6 +117,9 @@ contract Oracle {
             // not everyone revealed -> return invested ether for this lottery round
             returnFunds();
             Lottery(c.owner).returnTicketPrices();
+
+            //reset the commits
+            resetParticipants();
         }else{
             revert("It is too early to end the lottery");
         }
@@ -129,7 +132,7 @@ contract Oracle {
             emit LogRandom(c.result);
             Lottery(c.owner).closeLotteryIfApplicable(c.result);
             returnFunds();
-            //reset participants
+            //reset the participants, that a new lottery round can start
             resetParticipants();
              return c.result;
          }else {
