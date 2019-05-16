@@ -1,5 +1,8 @@
 <template lang="html">
   <div class="main-container">
+    <div class="title">
+      Smart Contract Lottery
+    </div>
     <div class="status">
     </div>
     <div v-for="account in accounts" v-bind:key="account" class="account">
@@ -7,13 +10,13 @@
         {{ account }}
       </div>
       <div class="number-input account-content">
-        <input class="number" type="text" name="" value="number">
+        <input class="number" type="text" name="" placeholder="Number">
       </div>
       <div class="secret-input account-content">
-        <input class="secret" type="text" name="" value="secret">
+        <input class="secret" type="password" name="" placeholder="Secret">
       </div>
       <div class="account-content">
-        <button class="buy-button" type="button" name="button">Buy Ticket</button>
+        <button @click="buyTicket" class="buy-button" type="button" name="button">Buy Ticket</button>
       </div>
     </div>
   </div>
@@ -39,6 +42,9 @@ export default {
   methods: {
     getAccounts: async function () {
       this.accounts = await this.web3.eth.getAccounts()
+    },
+    buyTicket: async function () {
+
     }
   }
 }
@@ -52,6 +58,11 @@ export default {
   width: 90%;
   height: 100%;
   margin: auto;
+}
+
+.title {
+  font-size: 27px;
+  padding-top: 10px;
 }
 .account {
   padding: 10px;
