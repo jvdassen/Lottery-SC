@@ -15,12 +15,12 @@ contract("Lottery and Oracle test", async function(accounts) {
 
   lotteryAndOracle1Winner();
   lotteryAndOracl2Winners();
-  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
   lotteryAndOracle0Winners();
+  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
 });
 
 function lotteryAndOracle1Winner () {
-		it("Lottery and Oracle Integration", async function() {
+		it("One winner - One round", async function() {
 
       var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -99,7 +99,7 @@ function lotteryAndOracle1Winner () {
 		});	
 }
 function lotteryAndOracl2Winners () {
-		it("Lottery and Oracle Integration", async function() {
+		it("Two winners - One round", async function() {
 
       var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -176,7 +176,7 @@ function lotteryAndOracl2Winners () {
 }
 
 function lotteryAndOracle0Winners () {
-		it("Lottery and Oracle Integration", async function() {
+		it("No winners - One round", async function() {
 
       var balancePlayer1before = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
 			var balancePlayer2before = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
@@ -250,7 +250,7 @@ function lotteryAndOracle0Winners () {
 }
 
 function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
-		it("Lottery and Oracle Integration", async function() {
+		it("One winner in second round", async function() {
     
       var balancePlayer3before = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
       var balancePlayer3after;
