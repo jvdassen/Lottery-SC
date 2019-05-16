@@ -45,7 +45,7 @@ contract Lottery {
         ticketNumbers.push(numberForTicket);
     }
     
-    function abuyTicket2 (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
+    function buyTicket2 (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
         require(
             msg.value >= lotteryState.ticketPrice,
             "Not enough Ether provided."
