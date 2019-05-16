@@ -72,7 +72,7 @@ function lotteryAndOracle1Winner () {
         assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 4);
         balancePlayer2before = balancePlayer2after;
         
-        await lottery.buyTicket(6, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
+        await lottery.buyTicket(0, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
         balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
         assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 4);
         balancePlayer3before = balancePlayer3after;
@@ -145,17 +145,17 @@ function lotteryAndOracl2Winners () {
       assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 4);
       balancePlayer1before = balancePlayer1after;
 
-      await lottery.buyTicket(6, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
+      await lottery.buyTicket(0, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
       balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
       assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 4);
       balancePlayer2before = balancePlayer2after;
 
-      await lottery.abuyTicket2(3, {from: Player2,value: await web3.utils.toWei('3.0', "ether")});
+      await lottery.buyCommitfreeTicket(3, {from: Player2,value: await web3.utils.toWei('3.0', "ether")});
       balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
       assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 3);
       balancePlayer2before = balancePlayer2after;
       
-      await lottery.buyTicket(6, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
+      await lottery.buyTicket(0, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
       balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
       assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 4);
       balancePlayer3before = balancePlayer3after;
@@ -312,7 +312,7 @@ function lotteryAndOracle0WinnersFirstRound1WinnerSecondRound () {
         
         await lottery.buyTicket(4, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
         
-        await lottery.buyTicket(6, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
+        await lottery.buyTicket(0, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
 
         balancePlayer3after = await web3.utils.fromWei(await web3.eth.getBalance(Player3),'ether');
         assert.equal(Math.round(balancePlayer3after), Math.round(balancePlayer3before) - 4);
