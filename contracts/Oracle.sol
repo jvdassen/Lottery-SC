@@ -16,8 +16,6 @@ contract Oracle {
         bool      revealed;
     }
 
-	event LogCampaignAdded(uint256 indexed campaignID);
-
     modifier notBeBlank(bytes32 _s) {if (_s == "") revert("Should not be blank but is"); _;}
 
     modifier beBlank(bytes32 _s) {if (_s != "") revert("User allready commited a secret. Secret per user is limited to 1."); _;}
