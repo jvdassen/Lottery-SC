@@ -12,7 +12,7 @@ contract Lottery {
     uint256 numberOfWinners = 0;
     address oracleAddress;
 
-    uint16 nrOfUsers = 3;
+    uint16 nrOfSecrets = 3;
 
     struct State {
         bool open;
@@ -24,7 +24,6 @@ contract Lottery {
     struct Ticket {
         uint64 number;
         address payable sender;
-        bytes32 hashedSecret;
     }
 
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress) public {
@@ -41,13 +40,27 @@ contract Lottery {
           startNewCampaign();
         }
         forwardSecret(hashedSecret);
-        tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender, hashedSecret);
+        tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
+        totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
+        ticketNumbers.push(numberForTicket);
+    }
+    
+    function abuyTicket2 (uint64 numberForTicket) public payable lotteryIsOpen() numberIsAllowed(numberForTicket){
+        require(
+            msg.value >= lotteryState.ticketPrice,
+            "Not enough Ether provided."
+        );
+        // is it possible to submit no secret for a user?
+        if(numberOfTickets == 0) {
+          startNewCampaign();
+        }
+        tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
         totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
         ticketNumbers.push(numberForTicket);
     }
 
     function startNewCampaign () private {
-        Oracle(oracleAddress).startOrUpdateCampaign(nrOfUsers, nrOfUsers, lotteryState.oracleCost, 10);
+        Oracle(oracleAddress).startOrUpdateCampaign(nrOfSecrets, lotteryState.oracleCost, 10);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
@@ -81,12 +94,10 @@ contract Lottery {
 
 
     function closeLotteryIfApplicable (uint256 winningNumber) public {
-        if(ticketNumbers.length == nrOfUsers) {
-          lotteryState.open = false;
-          // check for the winners and pay them out
-          computeWinners(winningNumber);
-          payOut(winningNumber);
-        }
+        lotteryState.open = false;
+        // check for the winners and pay them out
+        computeWinners(winningNumber);
+        payOut(winningNumber);
     }
 
     event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot);

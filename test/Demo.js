@@ -13,10 +13,10 @@ contract("Lottery and Oracle test", async function(accounts) {
 	Player2 = accounts[1];
 	Player3 = accounts[2];
 
-  lotteryAndOracle1Winner();
+  //lotteryAndOracle1Winner();
   lotteryAndOracl2Winners();
-  lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
-  lotteryAndOracle0Winners();
+  //lotteryAndOracle0WinnersFirstRound1WinnerSecondRound();
+  //lotteryAndOracle0Winners();
 });
 
 function lotteryAndOracle1Winner () {
@@ -144,10 +144,15 @@ function lotteryAndOracl2Winners () {
       balancePlayer1after = await web3.utils.fromWei(await web3.eth.getBalance(Player1),'ether');
       assert.equal(Math.round(balancePlayer1after), Math.round(balancePlayer1before) - 4);
       balancePlayer1before = balancePlayer1after;
-      
+
       await lottery.buyTicket(6, "0xd91f4db0fc8ef29728d9521f4d07a7dd8b19cccb6133f4bf8bf400b8800beb2d", {from: Player2,value: await web3.utils.toWei('4.0', "ether")});
       balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
       assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 4);
+      balancePlayer2before = balancePlayer2after;
+
+      await lottery.abuyTicket2(3, {from: Player2,value: await web3.utils.toWei('3.0', "ether")});
+      balancePlayer2after = await web3.utils.fromWei(await web3.eth.getBalance(Player2),'ether');
+      assert.equal(Math.round(balancePlayer2after) , Math.round(balancePlayer2before) - 3);
       balancePlayer2before = balancePlayer2after;
       
       await lottery.buyTicket(6, "0xfe29ae60035e8b541f5ba39d708138f4d015cae36e88bc6ebfcacb744fbad758", {from: Player3,value: await web3.utils.toWei('4.0', "ether")});
@@ -165,8 +170,8 @@ function lotteryAndOracl2Winners () {
 
         var oracleFee = 1;
         assert.equal(Math.round(balancePlayer1after)-oracleFee, Math.round(balancePlayer1before));
-        /*assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before + 4.5));
-        assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before + 4.5));*/
+        assert.equal(Math.round(balancePlayer2after)-oracleFee, Math.round(balancePlayer2before) + 6);
+        assert.equal(Math.round(balancePlayer3after)-oracleFee, Math.round(balancePlayer3before) + 6);
       });	
 }
 
