@@ -40,7 +40,7 @@ contract Oracle {
 	}
 
 
-	function startOrUpdateCampaign(uint256 numberOfSecrets,uint256 minimumFunding,uint16 modulo) public {
+	function initializeOracleState(uint256 numberOfSecrets,uint256 minimumFunding,uint16 modulo) public {
 
         c.minimumFunding = minimumFunding;
         c.modulo = modulo;
@@ -60,11 +60,11 @@ contract Oracle {
     notBeBlank(hashedSecret) payable {
         if (msg.value < c.minimumFunding) revert("Please provide the necessary funds");
         if (!c.commitPhase) revert("Currently the lottery is not in the commit phase.");
-        commitmentCampaign(hashedSecret, author);
+        commitmentOracle(hashedSecret, author);
         c.deposit += msg.value;
     }
 
-	function commitmentCampaign(
+	function commitmentOracle(
         bytes32 hashedSecret,
         address payable author
     )internal
@@ -86,7 +86,7 @@ contract Oracle {
         Participant storage p = c.participants[msg.sender];
        // if (block.number >= c.revealDeadline) revert("Revealphase is already over");
         if (!c.revealPhase) revert("Currently the lottery is not in the reveal phase.");
-        revealCampaign(secret, p);
+        revealOracle(secret, p);
     }
 
     modifier checkSecret(string memory secret, bytes32 _commitment) {
@@ -94,7 +94,7 @@ contract Oracle {
         _;
     }
 
-    function revealCampaign(
+    function revealOracle(
         string memory secret,
         Participant storage p
     ) internal

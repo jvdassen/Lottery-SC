@@ -53,7 +53,7 @@ function lotteryAndOracle1Winner () {
 
       var oracleCost = await web3.utils.toWei('1.0', "ether");
       
-      await oracleInstance.startOrUpdateCampaign(3,3, oracleCost, 10);
+      await oracleInstance.initializeOracleState(3,3, oracleCost, 10);
       
       await oracleInstance.commit(campaign,"0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6", Player1, {from: Player1,value: await web3.utils.toWei('1.0', "ether")});
       
