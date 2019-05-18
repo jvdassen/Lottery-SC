@@ -39,7 +39,7 @@ contract Lottery {
             "Not enough Ether provided."
         );
         if(numberOfTickets == 0) {
-          startNewCampaign();
+          startNewOracle();
         }
         forwardSecret(hashedSecret);
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
@@ -54,15 +54,15 @@ contract Lottery {
         );
         // it is possible to submit no secret for a user
         if(numberOfTickets == 0) {
-          startNewCampaign();
+          startNewOracle();
         }
         tickets[numberOfTickets++] = Ticket(numberForTicket, msg.sender);
         totalPriceMoney = totalPriceMoney + lotteryState.ticketPrice;
         ticketNumbers.push(numberForTicket);
     }
 
-    function startNewCampaign () private {
-        Oracle(oracleAddress).startOrUpdateCampaign(nrOfSecrets, lotteryState.oracleCost, oracleModulo);
+    function startNewOracle () private {
+        Oracle(oracleAddress).initializeOracleState(nrOfSecrets, lotteryState.oracleCost, oracleModulo);
     }
 
     function forwardSecret (bytes32 hashedSecret) private {
