@@ -38,9 +38,7 @@ export default {
     return {
       rawAccounts: [],
       accounts: [{
-        hash: "",
-        number: Number,
-        secret: ""
+        hash: ""
       }],
       status: {},
       balances: [],
@@ -50,8 +48,8 @@ export default {
   mounted: function () {
     web3 = new Web3('ws://127.0.0.1:7545');
 
-    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xeBc782918cBC69fe6C00912596Af7d72C892aF07");
-    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0x9c768F53B2a61753754B07209c67A983FF42515A");
+    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0xFB3177930e88c457444Ef1a4416B9a3b6c6393d0");
+    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xB274f73b672d3F5A9B9c2C54af275254cd685094");
 
     oracleContract.getPastEvents("allEvents", {
         fromBlock: 0,
@@ -68,6 +66,8 @@ export default {
     },
     buyTicket: async function (account) {
       if (account.secret === "") {
+        console.log("bought ticket from account " + account.hash + " and number " + account.number );
+
         lotteryContract.methods.buyCommitfreeTicket(account.number).send({from: account.hash, value: web3.utils.toWei('1.0', "ether")})
         .on('transactionHash', (hash) => {
             console.log(hash);
