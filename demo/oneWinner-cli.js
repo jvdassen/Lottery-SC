@@ -19,7 +19,7 @@ contract("Lottery and Oracle test", async function(accounts) {
     var receipt = await client.buyTicket(lottery, 0, Player1)
     client.informAboutUpdates()
 
-    var receipt = await client.buyTicket(lottery, 1, Player2)
+    var receipt = await client.buyTicket(lottery, 0, Player2)
     var receipt = await client.buyTicket(lottery, 2, Player3)
     await timeout(1000)
   })
@@ -36,7 +36,7 @@ function Client () {
   this.userBalance = 0
 
   this.secrets = [
-	  /*
+    /*
     {
       hash: "0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6",
       secret: "1",
@@ -77,7 +77,7 @@ function Client () {
     })
 
     if(this.counter == 0) {
-      this.userNumber = number
+      this.userNumber = number 
       this.userBalance = await web3.utils.fromWei(await web3.eth.getBalance(player))
     }
     await this.lotteryInstance.buyTicket(number, hashedSecret, { from: player, value: web3.utils.toWei('4.0', "ether") })
@@ -86,6 +86,7 @@ function Client () {
     await this.checkAutoReveal()
     return this.counter
   }
+
   Client.prototype.checkAutoReveal = async function () {
     if(this.counter == 3) {
       console.log('INFO: Lottery has enough players.. Starting autoreveal')
@@ -94,25 +95,37 @@ function Client () {
       })
     }
   }
+
   Client.prototype.informAboutUpdates = function () {
     var client = this
     this.oracleInstance.LogCommit(function (err, response) {
        console.log('INFO: Someone else just joined your lottery!')
     })
-    this.oracleInstance.LogRandom(async function (err, response) {
-       var randnr = parseInt(response.args.random)
+    this.lotteryInstance.LotteryEnd(async function (err, response) {
+       var winners = response.args.winners
+       var winningNumber = parseInt(response.args.winningNumber)
+       var pot = web3.utils.fromWei(response.args.pot)
+       var rewardPerWinner = web3.utils.fromWei(response.args.pricePerWinner)
+
        console.log('INFO: Your lottery has ended.')
-       console.log('INFO: Number is picked: ', randnr)
-       if(randnr == client.userNumber) {
+       console.log('INFO: Number is picked: ', parseInt(response.args.winningNumber))
+       if(winners.indexOf(client.secrets[0].user) >= 0) {
          console.log('INFO: 🎉 You just won the lottery 🎉')
        }
       var newBalance = await web3.utils.fromWei(await web3.eth.getBalance(client.secrets[0].user))
-	    console.log('INFO: Your balance changed by ', newBalance - client.userBalance)
+      console.log('INFO: Your balance changed by ', newBalance - client.userBalance)
+	    console.log('INFO: Summary of this game:')
+	    console.table([{
+	      successful: winners.length > 0 ? 'yes' : 'no',
+	      winners: winners.map(e => `${e.substr(0, 6)}..${e.substr(-6)}`),
+              pot: pot,
+	      number: winningNumber,
+	      averageReward: rewardPerWinner
+	    }])
     })
   }
-
 }
 
 function timeout(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
