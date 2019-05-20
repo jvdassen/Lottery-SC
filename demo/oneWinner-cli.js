@@ -13,14 +13,15 @@ contract("Lottery and Oracle test", async function(accounts) {
   Player3 = accounts[2]
 
   it("Client usage", async function() {
+    var winningNumber = 0
     var client = new Client()
 
     var lottery = await client.startSmallLottery()
-    var receipt = await client.buyTicket(lottery, 0, Player1)
+    var receipt = await client.buyTicket(lottery, winningNumber, Player1)
     client.informAboutUpdates()
 
-    var receipt = await client.buyTicket(lottery, 0, Player2)
-    var receipt = await client.buyTicket(lottery, 2, Player3)
+    var receipt = await client.buyTicket(lottery, 2, Player2)
+    var receipt = await client.buyTicket(lottery, winningNumber, Player3)
     await timeout(1000)
   })
 })
@@ -120,7 +121,7 @@ function Client () {
 	      winners: winners.map(e => `${e.substr(0, 6)}..${e.substr(-6)}`),
               pot: pot,
 	      number: winningNumber,
-	      averageReward: rewardPerWinner
+	      averageReward: winners.length > 0 ? rewardPerWinner : 0
 	    }])
     })
   }
