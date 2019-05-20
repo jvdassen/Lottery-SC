@@ -82,7 +82,7 @@ contract Lottery {
             if(numberOfWinners >= 1) {
                 // one or more persons claimed the price -> pay them and reset the checkpot
                 uint pricePerWinner = (totalPriceMoney) / numberOfWinners;
-                emit LotteryEnd(winningNumber, winners, 0, pricePerWinner);
+                emit LotteryEnd(winningNumber, winners, 0, pricePerWinner - lotteryState.ticketPrice);
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
