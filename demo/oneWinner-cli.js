@@ -21,8 +21,15 @@ contract("Lottery and Oracle test", async function(accounts) {
     client.informAboutUpdates()
 
     var receipt = await client.buyTicket(lottery, 2, Player2)
-    var receipt = await client.buyTicket(lottery, winningNumber, Player3)
+    var receipt = await client.buyTicket(lottery, 3, Player3)
     await timeout(1000)
+	/*
+    var receipt = await client.buyTicket(lottery, winningNumber, Player1)
+
+    var receipt = await client.buyTicket(lottery, 2, Player2)
+    var receipt = await client.buyTicket(lottery, 5, Player3)
+    await timeout(1000)
+    */
   })
 })
 
@@ -91,8 +98,13 @@ function Client () {
   Client.prototype.checkAutoReveal = async function () {
     if(this.counter == 3) {
       console.log('INFO: Lottery has enough players.. Starting autoreveal')
-      this.secrets.forEach(async (el) => {
+      this.secrets.forEach(async (el, i) => {
         await this.oracleInstance.reveal(el.secret, {from: el.user})
+	if(i == 2) {
+	 this.secrets = []
+	 this.counter = 0
+	 this.userBalance = 0
+	}
       })
     }
   }
