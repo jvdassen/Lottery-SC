@@ -48,16 +48,18 @@ export default {
   mounted: function () {
     web3 = new Web3('ws://127.0.0.1:7545');
 
-    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0xFB3177930e88c457444Ef1a4416B9a3b6c6393d0");
-    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xB274f73b672d3F5A9B9c2C54af275254cd685094");
+    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0xC7773C67477A195520eA96e27d3ab0bf7d7fFe91");
+    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xc52Ea7931C6EFBe0b8096dd0cf1030e1ACA697b7");
+
+    console.log("oracle address: " + oracleContract.options.address);
+    console.log("lottery address: " + lotteryContract.options.address);
+
 
     oracleContract.getPastEvents("allEvents", {
         fromBlock: 0,
         toBlock: 'latest'
     }, (error, event) => { console.log(event); console.log(error);})
-    .then((events) => {
-    console.log(events) // same results as the optional callback above
-});
+
     this.getAccounts()
   },
   methods: {
@@ -68,7 +70,8 @@ export default {
       if (account.secret === "") {
         console.log("bought ticket from account " + account.hash + " and number " + account.number );
 
-        lotteryContract.methods.buyCommitfreeTicket(account.number).send({from: account.hash, value: web3.utils.toWei('1.0', "ether")})
+        lotteryContract.methods.buyCommitfreeTicket(account.number).estimateGas({from: account.hash, value: web3.utils.toWei('6.0', "ether")})
+/*
         .on('transactionHash', (hash) => {
             console.log(hash);
         })
@@ -81,11 +84,19 @@ export default {
             console.log(receipt);
         })
         .on('error', console.error); // If there's an out of gas error the second parameter is the receipt.
+*/
       } else {
         let hashedSecret = '0x' + keccak('keccak256').update(account.secret).digest('hex');
         console.log("bought ticket from account " + account.hash + " and number " + account.number + "and secret " + hashedSecret);
 
-        lotteryContract.methods.buyTicket(account.number, hashedSecret).send({from: account.hash, value: web3.utils.toWei('1.0', "ether")})
+        lotteryContract.methods.buyTicket(account.number, hashedSecret).send({from: account.hash, value: web3.utils.toWei('4.0', "ether")})
+        .then(function(gasAmount){
+            console.log(gasAmount);
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+/*
         .on('transactionHash', (hash) => {
             console.log(hash);
         })
@@ -97,6 +108,7 @@ export default {
             console.log(receipt);
         })
         .on('error', console.error); // If there's an out of gas error the second parameter is the receipt.
+*/
       }
     },
     reveal: function (account) {
