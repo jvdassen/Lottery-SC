@@ -27,6 +27,8 @@ contract Lottery {
         address payable sender;
     }
 
+    // actually correct would be to remove the parameter maxNumber and just take modulo - 1 there, 
+    // but because of the test cases we need to have the possibility to adapt it there
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress, uint16 modulo) public {
         lotteryState = State(true, maxNum, price, oracleCost);
         oracleAddress = oracleInstanceAddress;
