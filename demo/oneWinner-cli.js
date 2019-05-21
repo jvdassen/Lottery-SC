@@ -18,12 +18,14 @@ contract("Lottery and Oracle test", async function(accounts) {
 
     var lottery = await client.startSmallLottery()
     var receipt = await client.buyTicket(lottery, winningNumber, Player1)
+    await client.enableAutoReveal()
     client.informAboutUpdates()
 
     var receipt = await client.buyTicket(lottery, 2, Player2)
     var receipt = await client.buyTicket(lottery, 3, Player3)
     await timeout(1000)
-	/*
+/*	
+    await timeout(4000)
     var receipt = await client.buyTicket(lottery, winningNumber, Player1)
 
     var receipt = await client.buyTicket(lottery, 2, Player2)
@@ -92,22 +94,25 @@ function Client () {
     await this.lotteryInstance.buyTicket(number, hashedSecret, { from: player, value: web3.utils.toWei('4.0', "ether") })
     this.counter++
     await timeout(3000)
-    await this.checkAutoReveal()
     return this.counter
   }
 
   Client.prototype.checkAutoReveal = async function () {
-    if(this.counter == 3) {
+    //if(this.counter == 3) {
+    if(true) {
       console.log('INFO: Lottery has enough players.. Starting autoreveal')
       this.secrets.forEach(async (el, i) => {
         await this.oracleInstance.reveal(el.secret, {from: el.user})
-	if(i == 2) {
-	 this.secrets = []
-	 this.counter = 0
-	 this.userBalance = 0
-	}
       })
     }
+  }
+
+  Client.prototype.enableAutoReveal = function ( ) {
+    var client = this;
+    this.oracleInstance.RevealOpen(async function () {
+      await client.checkAutoReveal()
+    })
+
   }
 
   Client.prototype.informAboutUpdates = function () {
@@ -136,6 +141,10 @@ function Client () {
 	      number: winningNumber,
 	      averageReward: winners.length > 0 ? rewardPerWinner : 0
 	    }])
+
+       client.secrets = []
+       client.counter = 0
+       client.userBalance = 0
     })
   }
 }

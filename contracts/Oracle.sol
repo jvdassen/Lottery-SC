@@ -77,9 +77,11 @@ contract Oracle {
             c.commitPhase = false;
             c.revealPhase = true;
             c.earliestEndOfRevealPhase = block.number + c.numberOfSecrets;
+            emit RevealOpen(true);
         }
     }
 
+  event RevealOpen(bool open);
 	event LogReveal(address indexed from, string secret);
 
     function reveal(string calldata secret) external {
