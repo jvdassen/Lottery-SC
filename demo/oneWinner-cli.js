@@ -74,7 +74,8 @@ function Client () {
     return web3.utils.keccak256(input)
   }
   Client.prototype.buyTicket = async function (lotteryInstance, number, player) {
-    var secret = "" + Math.random * 10000000000000
+    var secret = "" + Math.random() * 10000000000000
+    console.log('generated secret', secret)
 
 
     var hashedSecret = await this.generateHashedSecret(secret)
