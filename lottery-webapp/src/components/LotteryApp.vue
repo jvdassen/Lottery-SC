@@ -5,18 +5,18 @@
     </div>
     <div class="status">
     </div>
-    <div v-for="account in accounts" v-bind:key="account.hash" class="account">
+    <div v-for="(account, index) in accounts" v-bind:key="account.hash" class="account">
       <div class="account-hash account-content">
         {{ account.hash }}
       </div>
       <div class="number-input account-content">
-        <input v-model="account.number" class="number" type="text" name="" placeholder="Number">
+        <input v-model="account.number" class="number" type="number" name="" placeholder="Number">
       </div>
       <div class="secret-input account-content">
         <input v-model="account.secret" class="secret" type="password" name="" placeholder="Secret">
       </div>
       <div class="account-content">
-        <button @click="buyTicket(account)" class="buy-button" type="button" name="button">Buy Ticket</button>
+        <button @click="buyTicket(account, index)" :class="{disabled: account.number == ''}" class="buy-button" type="button" name="button">Buy Ticket</button>
         <button @click="reveal(account)" class="buy-button" type="button" name="button">Reveal</button>
       </div>
     </div>
@@ -38,7 +38,7 @@ export default {
     return {
       rawAccounts: [],
       accounts: [{
-        hash: ""
+        hash: "",
       }],
       status: {},
       balances: [],
@@ -48,70 +48,36 @@ export default {
   mounted: function () {
     web3 = new Web3('ws://127.0.0.1:7545');
 
-    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0xFB3177930e88c457444Ef1a4416B9a3b6c6393d0");
-    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xB274f73b672d3F5A9B9c2C54af275254cd685094");
+    oracleContract = new web3.eth.Contract(OracleJSON.abi, "0xC7773C67477A195520eA96e27d3ab0bf7d7fFe91");
+    lotteryContract = new web3.eth.Contract(LotteryJSON.abi, "0xc52Ea7931C6EFBe0b8096dd0cf1030e1ACA697b7");
 
-    oracleContract.getPastEvents("allEvents", {
+    oracleContract.events.allEvents({
         fromBlock: 0,
         toBlock: 'latest'
     }, (error, event) => { console.log(event); console.log(error);})
-    .then((events) => {
-    console.log(events) // same results as the optional callback above
-});
+
     this.getAccounts()
   },
   methods: {
     getAccounts: async function () {
       this.rawAccounts = await web3.eth.getAccounts()
     },
-    buyTicket: async function (account) {
+    buyTicket: async function (account, index) {
       if (account.secret === "") {
-        console.log("bought ticket from account " + account.hash + " and number " + account.number );
 
-        lotteryContract.methods.buyCommitfreeTicket(account.number).send({from: account.hash, value: web3.utils.toWei('1.0', "ether")})
-        .on('transactionHash', (hash) => {
-            console.log(hash);
-        })
-        .on('confirmation', (confirmationNumber, receipt) => {
-            console.log(confirmationNumber);
-            console.log(receipt);
-        })
-        .on('receipt', (receipt) => {
-            // receipt example
-            console.log(receipt);
-        })
-        .on('error', console.error); // If there's an out of gas error the second parameter is the receipt.
+        lotteryContract.methods.buyCommitfreeTicket(account.number).send({from: account.hash, value: web3.utils.toWei('3.0', "ether")})
+        .on('error', console.error);
+
       } else {
         let hashedSecret = '0x' + keccak('keccak256').update(account.secret).digest('hex');
-        console.log("bought ticket from account " + account.hash + " and number " + account.number + "and secret " + hashedSecret);
 
-        lotteryContract.methods.buyTicket(account.number, hashedSecret).send({from: account.hash, value: web3.utils.toWei('1.0', "ether")})
-        .on('transactionHash', (hash) => {
-            console.log(hash);
-        })
-        .on('confirmation', (confirmationNumber, receipt) => {
-            console.log(confirmationNumber);
-            console.log(receipt);
-        })
-        .on('receipt', (receipt) => {
-            console.log(receipt);
-        })
-        .on('error', console.error); // If there's an out of gas error the second parameter is the receipt.
+        lotteryContract.methods.buyTicket(account.number, hashedSecret).send({from: account.hash, value: web3.utils.toWei('4.0', "ether")})
+        .on('error', console.error);
       }
     },
     reveal: function (account) {
       oracleContract.methods.reveal(account.secret).send({from: account.hash})
-      .on('transactionHash', (hash) => {
-          console.log(hash);
-      })
-      .on('confirmation', (confirmationNumber, receipt) => {
-          console.log(confirmationNumber);
-          console.log(receipt);
-      })
-      .on('receipt', (receipt) => {
-          console.log(receipt);
-      })
-      .on('error', console.error); // If there's an out of gas error the second parameter is the receipt.
+      .on('error', console.error);
     }
   },
   watch: {
@@ -151,8 +117,11 @@ export default {
   border: none;
   height: 30px;
   width: 100px;
+  margin-right: 10px;
 }
 
-
-
+.disabled {
+  color: grey;
+  background-color: #aaaaaa;
+}
 </style>
