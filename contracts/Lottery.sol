@@ -100,6 +100,10 @@ contract Lottery {
 
 
     function closeLotteryIfApplicable (uint256 winningNumber) public {
+        require(
+            msg.sender == oracleAddress,
+            "Only Oracle can repay the ticket prices."
+        );
         lotteryState.open = false;
         // check for the winners and pay them out
         computeWinners(winningNumber);
