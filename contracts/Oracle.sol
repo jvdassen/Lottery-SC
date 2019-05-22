@@ -77,9 +77,11 @@ contract Oracle {
             c.commitPhase = false;
             c.revealPhase = true;
             c.earliestEndOfRevealPhase = block.number + c.numberOfSecrets;
+            emit RevealOpen(true);
         }
     }
 
+  event RevealOpen(bool open);
 	event LogReveal(address indexed from, string secret);
 
     function reveal(string calldata secret) external {
@@ -113,7 +115,7 @@ contract Oracle {
     event LogRandom(uint256 random);
 
     function endLottery( ) external {
-        if(block.number > c.earliestEndOfRevealPhase){
+        if(c.revealPhase && block.number > c.earliestEndOfRevealPhase){
             // not everyone revealed -> return invested ether for this lottery round
             returnFunds();
             Lottery(c.owner).returnTicketPrices();

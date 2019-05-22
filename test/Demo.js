@@ -42,10 +42,7 @@ function lotteryAndOracle1Winner () {
 				if (!error) {
 					//numberOfCommitsMade++;
 					//Address = response.args.addr;
-					console.log(lottery.address)
-					console.log(oracle.address)
 
-					console.log(response);
 				}else{
 					console.log(error);
 				}

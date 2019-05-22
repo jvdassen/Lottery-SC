@@ -27,6 +27,8 @@ contract Lottery {
         address payable sender;
     }
 
+    // actually correct would be to remove the parameter maxNumber and just take modulo - 1 there, 
+    // but because of the test cases we need to have the possibility to adapt it there
     constructor (uint64 maxNum, uint256 price, uint256 oracleCost, address oracleInstanceAddress, uint16 modulo) public {
         lotteryState = State(true, maxNum, price, oracleCost);
         oracleAddress = oracleInstanceAddress;
@@ -82,13 +84,15 @@ contract Lottery {
             if(numberOfWinners >= 1) {
                 // one or more persons claimed the price -> pay them and reset the checkpot
                 uint pricePerWinner = (totalPriceMoney) / numberOfWinners;
+                emit LotteryEnd(winningNumber, winners, 0, pricePerWinner - lotteryState.ticketPrice);
                 for(uint winnerIndex = 0; winnerIndex < winners.length; winnerIndex++) {
                     // create transaction and send the price to each winner
                     winners[winnerIndex].transfer(pricePerWinner);
                 }
                 totalPriceMoney = 0;
+            } else {
+              emit LotteryEnd(winningNumber, winners, totalPriceMoney, 0);
             }
-            emit LotteryEnd(winningNumber, winners, totalPriceMoney);
             // reset ticket purchases at the end of a lottery round
             resetTicketPurchases();
             lotteryState.open = true;
@@ -96,13 +100,17 @@ contract Lottery {
 
 
     function closeLotteryIfApplicable (uint256 winningNumber) public {
+        require(
+            msg.sender == oracleAddress,
+            "Only Oracle can repay the ticket prices."
+        );
         lotteryState.open = false;
         // check for the winners and pay them out
         computeWinners(winningNumber);
         payOut(winningNumber);
     }
 
-    event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot);
+    event LotteryEnd(uint256 winningNumber, address payable[] winners, uint256 pot, uint pricePerWinner);
 
     function returnTicketPrices() public {
         //return ticket costs of this round
