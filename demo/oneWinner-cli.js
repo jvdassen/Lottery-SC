@@ -1,7 +1,7 @@
 var OracleContract = artifacts.require("./Oracle.sol")
 var LotteryContract = artifacts.require("./Lottery.sol")
 var catchRevert = require("./Exceptions.js").catchRevert
-var Client = require("./Cli")
+var Client = require("../cli/Cli")
 
 
 var Player1
